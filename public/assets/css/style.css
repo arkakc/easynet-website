@@ -464,14 +464,7 @@ h1,h2,h3,h4{color:var(--ink-900)}
 .is-mobile .cta-band{padding:60px 0}
 .is-mobile .page-hero{padding:130px 0 54px}
 
-/* ---- View toggle button (Desktop / Mobile) ---- */
-.view-toggle{position:fixed;right:22px;bottom:82px;z-index:900;width:44px;height:44px;border-radius:12px;border:1px solid var(--line);cursor:pointer;background:#fff;color:var(--blue-700);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-md);transition:transform .2s,color .2s}
-.view-toggle:hover{transform:translateY(-3px);color:var(--blue-600)}
-.view-toggle .vt-desktop{display:none}
-html.is-mobile .view-toggle .vt-desktop{display:block}
-html.is-mobile .view-toggle .vt-mobile{display:none}
-@media (max-width:560px){
-  .view-toggle{right:16px;bottom:70px}
+
 }
 
 /* ============================================================
