@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://easynetsolutions.com.pg/sitemap.xml

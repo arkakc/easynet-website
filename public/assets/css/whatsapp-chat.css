@@ -1,0 +1,85 @@
+/* ============================================================
+   WhatsApp Lead Chat Widget — Easynet IT Solutions
+   Injected via whatsapp-chat.js (no HTML edits needed)
+   ============================================================ */
+
+.wa-fab{position:fixed;left:22px;bottom:22px;z-index:1500;width:60px;height:60px;border-radius:50%;
+  background:linear-gradient(135deg,#25D366,#128C7E);border:0;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 10px 30px rgba(37,211,102,.45);transition:transform .25s ease}
+.wa-fab:hover{transform:scale(1.08)}
+.wa-fab::before{content:"";position:absolute;inset:0;border-radius:50%;background:rgba(37,211,102,.5);z-index:-1;animation:waPulse 2.2s ease-out infinite}
+@keyframes waPulse{0%{transform:scale(1);opacity:.7}70%{transform:scale(1.55);opacity:0}100%{transform:scale(1.55);opacity:0}}
+.wa-fab .wa-badge{position:absolute;top:-2px;right:-2px;background:#FF3B30;color:#fff;font-size:11px;font-weight:800;min-width:20px;height:20px;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:0 5px;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+
+.wa-panel{position:fixed;left:22px;bottom:94px;z-index:1500;width:372px;max-width:calc(100vw - 32px);height:568px;max-height:calc(100dvh - 120px);
+  background:#EFE7DC;border-radius:18px;overflow:hidden;display:flex;flex-direction:column;
+  box-shadow:0 24px 70px rgba(6,26,51,.4);opacity:0;transform:translateY(24px) scale(.97);pointer-events:none;transition:opacity .3s ease,transform .3s ease}
+.wa-panel.open{opacity:1;transform:none;pointer-events:auto}
+
+.wa-head{background:linear-gradient(135deg,#075E54,#128C7E);color:#fff;padding:14px 16px;display:flex;align-items:center;gap:12px;flex:none}
+.wa-avatar{width:42px;height:42px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none}
+.wa-avatar img{width:100%;height:100%;object-fit:cover}
+.wa-head-info{flex:1;min-width:0}
+.wa-head-info b{display:block;font-size:15px;letter-spacing:.01em}
+.wa-head-info span{display:flex;align-items:center;gap:6px;font-size:12.5px;color:rgba(255,255,255,.85)}
+.wa-head-info .wa-dot{width:8px;height:8px;border-radius:50%;background:#4ADE80;box-shadow:0 0 0 3px rgba(74,222,128,.25);animation:waDot 2s ease-in-out infinite}
+@keyframes waDot{0%,100%{box-shadow:0 0 0 3px rgba(74,222,128,.25)}50%{box-shadow:0 0 0 6px rgba(74,222,128,.08)}}
+.wa-close{background:rgba(255,255,255,.14);border:0;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.wa-close:hover{background:rgba(255,255,255,.28)}
+
+.wa-body{flex:1;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:10px;
+  background-color:#EFE7DC;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%230B1B33' fill-opacity='0.035'%3E%3Ccircle cx='10' cy='10' r='2'/%3E%3Ccircle cx='50' cy='30' r='1.5'/%3E%3Ccircle cx='30' cy='60' r='2'/%3E%3Ccircle cx='70' cy='65' r='1.5'/%3E%3C/g%3E%3C/svg%3E")}
+
+.wa-msg{max-width:82%;padding:9px 12px;border-radius:12px;font-size:14px;line-height:1.45;position:relative;
+  animation:waIn .35s cubic-bezier(.22,.61,.36,1);word-wrap:break-word}
+@keyframes waIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.wa-msg.bot{align-self:flex-start;background:#fff;border-top-left-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,.09);color:#111B21}
+.wa-msg.user{align-self:flex-end;background:#DCF8C6;border-top-right-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,.09);color:#111B21}
+.wa-time{display:block;font-size:10.5px;color:#667781;text-align:right;margin-top:3px}
+.wa-msg .wa-emoji{font-size:16px}
+
+/* typing indicator */
+.wa-typing{display:inline-flex;gap:4px;align-items:center;padding:12px 14px}
+.wa-typing i{width:7px;height:7px;border-radius:50%;background:#9AA6B2;animation:waBlink 1.2s infinite}
+.wa-typing i:nth-child(2){animation-delay:.18s}
+.wa-typing i:nth-child(3){animation-delay:.36s}
+@keyframes waBlink{0%,60%,100%{opacity:.35;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+
+/* chips for service selection */
+.wa-chips{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-self:flex-start;width:100%;max-width:92%}
+.wa-chip{background:#fff;border:1.5px solid #D5DCE4;border-radius:11px;padding:10px 8px;font-size:13px;font-weight:600;color:#111B21;
+  cursor:pointer;text-align:center;transition:all .18s;font-family:inherit}
+.wa-chip:hover{border-color:#25D366;background:#F0FBF4}
+.wa-chip.selected{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border-color:transparent}
+
+/* summary card */
+.wa-summary{align-self:flex-start;background:#fff;border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.09);padding:14px;width:88%;font-size:13.5px}
+.wa-summary h4{margin:0 0 10px;font-size:14px;color:#075E54}
+.wa-summary div{display:flex;gap:8px;padding:3px 0;color:#111B21}
+.wa-summary .k{flex:none;width:74px;color:#667781;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+.wa-summary .v{font-weight:600;word-break:break-word}
+
+/* input row */
+.wa-input-row{flex:none;display:flex;gap:8px;padding:12px;background:#F0F0F0;border-top:1px solid #E0DED8;align-items:center}
+.wa-input{flex:1;border:1.5px solid transparent;border-radius:22px;padding:11px 16px;font-size:14px;font-family:inherit;background:#fff;outline:none;transition:border-color .2s}
+.wa-input:focus{border-color:#25D366}
+.wa-input.invalid{border-color:#FF3B30;animation:waShake .4s ease}
+@keyframes waShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-4px)}}
+.wa-skip{background:none;border:1.5px solid #C9CFD6;color:#5A6B7B;border-radius:22px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;white-space:nowrap}
+.wa-skip:hover{border-color:#5A6B7B;color:#111B21}
+.wa-send{flex:none;width:44px;height:44px;border-radius:50%;border:0;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .2s;box-shadow:0 4px 14px rgba(37,211,102,.4)}
+.wa-send:hover{transform:scale(1.07)}
+.wa-send:disabled{opacity:.5;cursor:default;transform:none}
+.wa-cta{align-self:stretch;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border:0;border-radius:13px;padding:15px 18px;
+  font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
+  box-shadow:0 8px 22px rgba(37,211,102,.4);transition:transform .2s,box-shadow .2s;margin:4px 0}
+.wa-cta:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(37,211,102,.5)}
+
+@media (max-width:520px){
+  .wa-fab{left:16px;bottom:16px}
+  .wa-panel{left:8px;bottom:88px;width:calc(100vw - 16px);height:calc(100dvh - 100px);max-height:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .wa-fab::before,.wa-head-info .wa-dot,.wa-typing i,.wa-msg{animation:none}
+}
