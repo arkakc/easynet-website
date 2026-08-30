@@ -256,3 +256,21 @@ document.querySelectorAll("[data-year]").forEach(el => el.textContent = new Date
     el.addEventListener("mouseleave", function () { el.style.transform = ""; });
   });
 })();
+
+/* ---- Smooth scroll for same-page anchor links (#services, #packages) ---- */
+(function(){
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  document.addEventListener("click", function(e){
+    var t = e.target;
+    var a = t.closest ? t.closest('a[href^="#"]') : null;
+    if(!a) return;
+    var id = a.getAttribute("href");
+    if(id.length < 2) return;
+    var el;
+    try { el = document.querySelector(id); } catch(err){ return; }
+    if(!el) return;
+    e.preventDefault();
+    el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    history.pushState(null, "", id);
+  });
+})();
