@@ -420,49 +420,7 @@ h1,h2,h3,h4{color:var(--ink-900)}
 /* Honeypot: visually hidden, only bots fill it */
 .hp-wrap{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 
-/* ============================================================
-   MOBILE VIEW (device-optimized serving)
-   Applied automatically to mobile devices by server.py, or
-   via the view-toggle button (cookie: easynet_view=mobile)
-   ============================================================ */
-.is-mobile section{padding:56px 0}
-.is-mobile .container{max-width:520px}
-/* lighter hero: skip the 156KB background image + glow orbs */
-.is-mobile .hero-bg-img,.is-mobile .hero-glow{display:none !important}
-.is-mobile .hero{padding-top:104px}
-.is-mobile .hero h1{font-size:clamp(27px,8vw,32px)}
-.is-mobile .hero-sub{font-size:14.5px}
-.is-mobile .hero-actions{flex-direction:column;align-items:center}
-.is-mobile .hero-actions .btn{width:100%;max-width:320px}
-.is-mobile .hero-stats{grid-template-columns:repeat(2,1fr);gap:18px}
-.is-mobile .hero-chips span{font-size:11.5px;padding:5px 11px}
-.is-mobile .section-head{margin-bottom:36px}
-.is-mobile .section-head h2{font-size:24px}
-/* stacked, single-column layouts */
-.is-mobile .grid-2,.is-mobile .grid-3,.is-mobile .grid-4{grid-template-columns:1fr}
-.is-mobile .packages{grid-template-columns:1fr;gap:22px}
-.is-mobile .pkg{position:relative}
-.is-mobile .pkg .p-sub{min-height:0}
-.is-mobile .process{grid-template-columns:1fr;gap:26px}
-.is-mobile .process::before{display:none}
-.is-mobile .about-grid,.is-mobile .vm-grid,.is-mobile .team-grid,
-.is-mobile .contact-grid,.is-mobile .partner-groups{grid-template-columns:1fr}
-.is-mobile .glance-grid{grid-template-columns:repeat(2,1fr);gap:18px}
-.is-mobile .footer-grid{grid-template-columns:1fr;gap:34px}
-.is-mobile .f-row{grid-template-columns:1fr}
-.is-mobile .flow{flex-direction:column}
-.is-mobile .flow .f-arrow{transform:rotate(90deg)}
-/* lean rendering: no scroll-reveal waiting, no heavy shadows */
-.is-mobile .reveal{opacity:1;transform:none;transition:none}
-.is-mobile .card,.is-mobile .pkg,.is-mobile .member{box-shadow:none}
-.is-mobile .marquee-track{animation-duration:45s}
-.is-mobile .btn{font-size:14.5px;padding:12px 22px}
-.is-mobile .nav-wrap{height:68px}
-.is-mobile .brand img{height:38px}
-.is-mobile .faq-q{font-size:15px;padding:16px 18px}
-.is-mobile .form-card{padding:24px 20px}
-.is-mobile .cta-band{padding:60px 0}
-.is-mobile .page-hero{padding:130px 0 54px}
+
 
 /* ---- View toggle button (Desktop / Mobile) ---- */
 .view-toggle{position:fixed;right:22px;bottom:82px;z-index:900;width:44px;height:44px;border-radius:12px;border:1px solid var(--line);cursor:pointer;background:#fff;color:var(--blue-700);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-md);transition:transform .2s,color .2s}
