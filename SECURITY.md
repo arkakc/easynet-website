@@ -45,14 +45,14 @@
 
 ## 4. Email security for the domain (SPF / DKIM / DMARC)
 
-Required before `info@easynet.com.pg` sends mail — prevents your domain from
+Required before `hello.easynet@hotmail.com` sends mail — prevents your domain from
 being spoofed for phishing. Add these DNS records at your registrar:
 
 | Type | Name | Value |
 |---|---|---|
 | TXT | `@` | `v=spf1 include:_spf.google.com ~all` *(adjust for your mail provider)* |
 | TXT | `easynet._domainkey` | *(DKIM public key from your mail provider, e.g. Google Workspace)* |
-| TXT | `_dmarc` | `v=DMARC1; p=quarantine; rua=mailto:info@easynet.com.pg; pct=100` |
+| TXT | `_dmarc` | `v=DMARC1; p=quarantine; rua=mailto:hello.easynet@hotmail.com; pct=100` |
 
 Start DMARC at `p=quarantine`, move to `p=reject` after 2–4 weeks of clean reports.
 
