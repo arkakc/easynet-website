@@ -27,7 +27,7 @@
   panel.setAttribute("aria-label", "Easynet WhatsApp chat");
   panel.innerHTML =
     '<div class="wa-head">' +
-      '<div class="wa-avatar"><img src="assets/images/logo.png" alt=""></div>' +
+      '<div class="wa-avatar">Hello</div>' +
       '<div class="wa-head-info"><b>Easynet IT Solutions</b><span><i class="wa-dot"></i>Online · replies within 1 business day</span></div>' +
       '<button class="wa-close" aria-label="Close chat">✕</button>' +
     '</div>' +
