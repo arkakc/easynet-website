@@ -5,7 +5,7 @@
 /* ---- Company contact config — update these values in ONE place ---- */
 const EASYNET = {
   name: "Easynet IT Solutions Limited",
-  email: "info@easynet.com.pg",          // TODO: replace with the official company email
+  email: "hello.easynet@hotmail.com",
   phone: "+675 72743186",             // TODO: replace with the company phone
   whatsapp: "67572743186",               // TODO: replace with the WhatsApp number (country code + number, digits only)
   whatsappMsg: "Hello Easynet IT Solutions! I would like to discuss a technology solution for my business.",
