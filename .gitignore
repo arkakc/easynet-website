@@ -1,0 +1,6 @@
+# Customer enquiry data — never commit personal data to Git
+data/
+
+# Python
+__pycache__/
+*.pyc

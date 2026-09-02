@@ -27,6 +27,51 @@ whatsapp-api/         WhatsApp Cloud API lead-capture server (Node.js)
 
 ---
 
+# Contact form (enquiry) backend
+
+The enquiry form on `contact.html` submits to **`POST /api/contact`**. Every
+enquiry gets a **sequence number**, is **stored** (downloadable as CSV) and is
+**emailed** to **hello.easynet@hotmail.com** with the subject
+**`WEB Enquiry Sequence No. {n}`** (the visitor's email is set as Reply-To).
+
+> ⚠️ **Hotmail/Outlook can no longer be used to SEND email from apps** —
+> Microsoft retired password/app-password SMTP for personal accounts in
+> March 2026. Emails are therefore sent via **Resend** (free: 3,000/month)
+> and simply *delivered to* the Hotmail inbox.
+
+## On Vercel (production)
+
+The endpoint is a serverless function: `api/contact.js`. Storage uses
+**Upstash Redis** (free tier, via Vercel Marketplace). One-time setup:
+
+1. **Resend** — sign up at https://resend.com **using
+   hello.easynet@hotmail.com**, create an API key, then in Vercel →
+   *Settings → Environment Variables* add `RESEND_API_KEY`.
+2. **Upstash Redis** — Vercel Dashboard → *Storage* (or *Marketplace*) →
+   add **Upstash for Redis** (free plan) and connect it to the project.
+   It auto-adds `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN`
+   (the older `KV_REST_API_*` names also work).
+3. **CSV export** — add env var `LEADS_EXPORT_TOKEN` (any long random
+   string), then download all enquiries at:
+   `https://YOUR-DOMAIN/api/export?token=THAT-TOKEN`
+4. **Redeploy** the project so the env vars take effect.
+
+If storage is temporarily unavailable the enquiry is still emailed (with a
+`T########` fallback reference); if email fails it is still stored.
+
+## Local / VPS (`server.py`)
+
+`python3 server.py` serves the site AND handles `/api/contact` itself:
+
+1. Enquiries are appended to `data/enquiries.csv` (git-ignored, never served).
+2. Emails are sent via Resend — set `RESEND_API_KEY` before starting, or any
+   generic SMTP provider via `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` /
+   `SMTP_PASS`. With neither configured, each email is saved to
+   `data/outbox/enquiry-XXXXX.eml` so nothing is ever lost.
+3. `CONTACT_TO` overrides the destination (default hello.easynet@hotmail.com).
+
+---
+
 # How to host: GitHub + Vercel (step by step)
 
 ## Step 1 — Create the GitHub repository

@@ -173,16 +173,46 @@ if (form) {
       `Name: ${data.name}\nCompany: ${data.company || "-"}\nEmail: ${data.email}\nPhone: ${data.phone}\n` +
       `Service Required: ${data.service}\n\nMessage:\n${data.message}\n\n— Sent from ${EASYNET.name} website`;
 
-    // 1) Attempt direct POST (works once a backend endpoint is enabled)
+    // Submit to the backend — only show success when the enquiry is actually saved
+    const btn = form.querySelector('button[type="submit"]');
+    if (btn) { btn.disabled = true; btn.style.opacity = ".7"; }
     fetch("/api/contact", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
-    }).then(r => { if (r.ok) showSuccess(); }).catch(() => showSuccess());
+    })
+      .then(r => r.json().catch(() => ({})).then(j => ({ ok: r.ok, json: j })))
+      .then(({ ok, json }) => {
+        if (ok && json.ok !== false) { showSuccess(json.sequence_no); }
+        else { showError(); }
+      })
+      .catch(() => showError());
 
-    function showSuccess() {
+    function resetBtn() {
+      if (btn) { btn.disabled = false; btn.style.opacity = ""; }
+    }
+
+    function showError() {
+      resetBtn();
+      let errBox = document.getElementById("form-error");
+      if (!errBox) {
+        errBox = document.createElement("p");
+        errBox.id = "form-error";
+        errBox.setAttribute("role", "alert");
+        errBox.style.cssText = "margin-top:14px;padding:12px 14px;border-radius:10px;background:#fef2f2;color:#b91c1c;font-size:14px;text-align:center";
+        form.appendChild(errBox);
+      }
+      errBox.textContent = "Sorry, we couldn't send your enquiry right now. Please try again, or email us directly at " + EASYNET.email + ".";
+    }
+
+    function showSuccess(seq) {
+      resetBtn();
       form.style.display = "none";
       const s = document.getElementById("form-success");
+      if (seq) {
+        const h = s.querySelector("h3");
+        if (h) h.textContent = "Enquiry Sent! (Ref #" + seq + ")";
+      }
       s.classList.add("show");
       s.scrollIntoView({ behavior: "smooth", block: "center" });
       // Fallback: also prepare a mailto link so nothing is lost without a backend
