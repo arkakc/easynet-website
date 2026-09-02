@@ -30,9 +30,10 @@ whatsapp-api/         WhatsApp Cloud API lead-capture server (Node.js)
 # Contact form (enquiry) backend
 
 The enquiry form on `contact.html` submits to **`POST /api/contact`**. Every
-enquiry gets a **sequence number**, is **stored** (downloadable as CSV) and is
-**emailed** to **hello.easynet@hotmail.com** with the subject
-**`WEB Enquiry Sequence No. {n}`** (the visitor's email is set as Reply-To).
+enquiry gets a **sequence number**, is **saved as a row in a Google Sheet**
+(your live leads database) and is **emailed** to **hello.easynet@hotmail.com**
+with the subject **`WEB Enquiry Sequence No. {n}`** (the visitor's email is set
+as Reply-To).
 
 > ⚠️ **Hotmail/Outlook can no longer be used to SEND email from apps** —
 > Microsoft retired password/app-password SMTP for personal accounts in
@@ -41,34 +42,44 @@ enquiry gets a **sequence number**, is **stored** (downloadable as CSV) and is
 
 ## On Vercel (production)
 
-The endpoint is a serverless function: `api/contact.js`. Storage uses
-**Upstash Redis** (free tier, via Vercel Marketplace). One-time setup:
+The endpoint is a serverless function: `api/contact.js`. Enquiries are saved
+to a **Google Sheet** via a tiny Apps Script Web App — no Upstash/Redis and no
+Google API keys needed. One-time setup:
 
 1. **Resend** — sign up at https://resend.com **using
    hello.easynet@hotmail.com**, create an API key, then in Vercel →
    *Settings → Environment Variables* add `RESEND_API_KEY`.
-2. **Upstash Redis** — Vercel Dashboard → *Storage* (or *Marketplace*) →
-   add **Upstash for Redis** (free plan) and connect it to the project.
-   It auto-adds `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN`
-   (the older `KV_REST_API_*` names also work).
-3. **CSV export** — add env var `LEADS_EXPORT_TOKEN` (any long random
-   string), then download all enquiries at:
-   `https://YOUR-DOMAIN/api/export?token=THAT-TOKEN`
+2. **Google Sheet** — see **`google-apps-script/Code.gs`** for the 3-minute
+   walkthrough. In short: create a Sheet → *Extensions → Apps Script* → paste
+   `Code.gs` → set `SHARED_SECRET` → *Deploy → Web app* (Execute as **Me**,
+   access **Anyone**) → copy the URL ending in `/exec`.
+3. In Vercel → *Settings → Environment Variables* add:
+   - `SHEETS_WEBAPP_URL` — the Web app URL from step 2
+   - `SHEETS_SECRET` — the same value as `SHARED_SECRET` in `Code.gs`
+   - `SHEETS_SPREADSHEET_URL` — the Sheet's normal browser URL (lets
+     `https://YOUR-DOMAIN/api/export?token=…` jump straight to the Sheet;
+     protect it with a long random `LEADS_EXPORT_TOKEN`)
 4. **Redeploy** the project so the env vars take effect.
 
-If storage is temporarily unavailable the enquiry is still emailed (with a
-`T########` fallback reference); if email fails it is still stored.
+Each new row lands in the Sheet's **"Leads"** tab with columns
+`sequence_no, timestamp, source, name, company, email, phone, service,
+message, page, user_agent, raw`. If the Sheet is temporarily unreachable the
+enquiry is still emailed (with a `T########` fallback reference); if email
+fails it is still saved to the Sheet.
 
 ## Local / VPS (`server.py`)
 
 `python3 server.py` serves the site AND handles `/api/contact` itself:
 
-1. Enquiries are appended to `data/enquiries.csv` (git-ignored, never served).
-2. Emails are sent via Resend — set `RESEND_API_KEY` before starting, or any
+1. Enquiries are appended to your **Google Sheet** — set `SHEETS_WEBAPP_URL`
+   and `SHEETS_SECRET` (see `google-apps-script/Code.gs`) before starting.
+2. If the Sheet is not configured or unreachable, enquiries fall back to
+   `data/enquiries.csv` (git-ignored, never served) so nothing is ever lost.
+3. Emails are sent via Resend — set `RESEND_API_KEY` before starting, or any
    generic SMTP provider via `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` /
    `SMTP_PASS`. With neither configured, each email is saved to
    `data/outbox/enquiry-XXXXX.eml` so nothing is ever lost.
-3. `CONTACT_TO` overrides the destination (default hello.easynet@hotmail.com).
+4. `CONTACT_TO` overrides the destination (default hello.easynet@hotmail.com).
 
 ---
 

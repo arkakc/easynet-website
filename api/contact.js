@@ -3,23 +3,22 @@
    POST /api/contact
    ------------------------------------------------------------
    • Validates + sanitizes the enquiry from public/contact.html
-   • Stores it in Upstash Redis (sequence counter + lead list)
+   • Saves it as a row in a Google Sheet (via an Apps Script
+     Web App — see google-apps-script/Code.gs for the 3-minute
+     setup) and assigns the next sequence number from the Sheet
    • Emails it to CONTACT_TO via Resend with subject:
        "WEB Enquiry Sequence No. {n}"
    Environment variables (set in Vercel → Settings → Env Vars):
-     UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN
-       (auto-added by the Upstash integration; KV_REST_API_URL /
-        KV_REST_API_TOKEN also accepted)
-     RESEND_API_KEY   — from resend.com
-     CONTACT_TO       — default: hello.easynet@hotmail.com
-     CONTACT_FROM     — default: onboarding@resend.dev
+     SHEETS_WEBAPP_URL — Apps Script Web App URL (ends in /exec)
+     SHEETS_SECRET     — must match SHARED_SECRET in Code.gs
+     RESEND_API_KEY    — from resend.com
+     CONTACT_TO        — default: hello.easynet@hotmail.com
+     CONTACT_FROM      — default: onboarding@resend.dev
    ============================================================ */
 "use strict";
 
-const REDIS_URL =
-  process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL || "";
-const REDIS_TOKEN =
-  process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN || "";
+const SHEETS_WEBAPP_URL = (process.env.SHEETS_WEBAPP_URL || "").trim();
+const SHEETS_SECRET = process.env.SHEETS_SECRET || "";
 const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
 const CONTACT_TO = process.env.CONTACT_TO || "hello.easynet@hotmail.com";
 const CONTACT_FROM =
@@ -33,18 +32,55 @@ function sanitize(v, limit) {
     .slice(0, limit);
 }
 
-async function redis(commands) {
-  // Upstash REST pipeline: [["INCR","key"], ["RPUSH","key","val"], ...]
-  const r = await fetch(REDIS_URL + "/pipeline", {
+/* Google Apps Script Web Apps answer the first POST with a 302
+   redirect to a one-time URL. fetch() would follow it as a GET and
+   lose the payload, so we follow manually and POST the body again. */
+async function postToWebApp(url, body) {
+  const headers = { "Content-Type": "text/plain;charset=utf-8" };
+  const payload = JSON.stringify(body);
+
+  let r = await fetch(url, {
     method: "POST",
-    headers: {
-      Authorization: "Bearer " + REDIS_TOKEN,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(commands),
+    headers,
+    body: payload,
+    redirect: "manual",
   });
-  if (!r.ok) throw new Error("Redis HTTP " + r.status);
-  return r.json();
+  const loc =
+    r.status >= 300 && r.status < 400 ? r.headers.get("location") : null;
+  if (loc) {
+    r = await fetch(loc, { method: "POST", headers, body: payload });
+  }
+  if (!r.ok) throw new Error("Sheets web app HTTP " + r.status);
+
+  const text = await r.text();
+  let out;
+  try { out = JSON.parse(text); } catch { out = null; }
+  if (!out || out.ok !== true) {
+    throw new Error("Sheets web app error: " + (out && out.error ? out.error : text.slice(0, 120)));
+  }
+  return out;
+}
+
+/* Save the enquiry to the Google Sheet; returns its sequence number. */
+async function saveToSheets(data, req) {
+  const ref = req && req.headers ? String(req.headers.referer || "") : "";
+  const ua = req && req.headers ? String(req.headers["user-agent"] || "") : "";
+  const out = await postToWebApp(SHEETS_WEBAPP_URL, {
+    secret: SHEETS_SECRET || undefined,
+    source: "website",
+    timestamp: new Date().toISOString(),
+    name: data.name,
+    company: data.company,
+    email: data.email,
+    phone: data.phone,
+    service: data.service,
+    message: data.message,
+    page: sanitize(ref ? ref.slice(ref.indexOf("/", 8)) : "/contact.html", 200),
+    user_agent: sanitize(ua, 300),
+  });
+  const seq = parseInt(out.seq, 10);
+  if (!seq) throw new Error("Sheets web app returned no sequence number");
+  return seq;
 }
 
 async function sendEmail(seq, data) {
@@ -116,25 +152,23 @@ module.exports = async (req, res) => {
       .json({ ok: false, error: "Missing or invalid fields.", fields: missing });
   }
 
-  // 1) Sequence number + storage (Upstash Redis)
+  // 1) Save to the Google Sheet (sequence number comes from the Sheet)
   let seq = null;
   let stored = false;
-  if (REDIS_URL && REDIS_TOKEN) {
+  if (SHEETS_WEBAPP_URL) {
     try {
-      const inc = await redis([["INCR", "enquiry:seq"]]);
-      seq = inc && inc[0] && inc[0].result;
-      const record = Object.assign(
-        { sequence_no: seq, timestamp: new Date().toISOString() },
-        data
-      );
-      await redis([["RPUSH", "enquiries", JSON.stringify(record)]]);
+      seq = await saveToSheets(data, req);
       stored = true;
     } catch (err) {
-      console.error("[redis]", err && err.message);
+      console.error("[sheets]", err && err.message);
     }
+  } else {
+    console.error(
+      "[sheets] SHEETS_WEBAPP_URL not set — enquiry not saved to Google Sheets"
+    );
   }
   if (!seq) {
-    // Fallback reference if storage is unavailable — enquiry still emailed
+    // Fallback reference if the Sheet is unavailable — enquiry still emailed
     seq = "T" + Date.now().toString().slice(-8);
   }
 
