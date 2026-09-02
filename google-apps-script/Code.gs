@@ -28,7 +28,7 @@
 var SHEET_NAME = "Leads";
 
 /** Must equal the SHEETS_SECRET env var on the website backend. */
-var SHARED_SECRET = "CHANGE-ME-to-a-long-random-string";
+var SHARED_SECRET = "easynet-live-Xk92mPq7Rw43Tz";
 
 var HEADERS = [
   "sequence_no", "timestamp", "source", "name", "company", "email",
@@ -70,6 +70,7 @@ function appendLead_(body) {
 
     // Header occupies row 1 → the next empty row number == data-row count + 1
     var seq = sheet.getLastRow();
+    body.sequence_no = seq; // write the computed number into the row itself
 
     if (!body.timestamp) {
       body.timestamp = Utilities.formatDate(
