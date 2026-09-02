@@ -179,7 +179,8 @@ if (form) {
     fetch("/api/contact", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
+      signal: AbortSignal.timeout(20000)
     })
       .then(r => r.json().catch(() => ({})).then(j => ({ ok: r.ok, json: j })))
       .then(({ ok, json }) => {
