@@ -35,6 +35,7 @@ function sanitize(v, limit) {
 /* Google Apps Script Web Apps answer the first POST with a 302
    redirect to a one-time URL. fetch() would follow it as a GET and
    lose the payload, so we follow manually and POST the body again. */
+const SHEETS_TIMEOUT_MS = 8000; 
 async function postToWebApp(url, body) {
   const headers = { "Content-Type": "text/plain;charset=utf-8" };
   const payload = JSON.stringify(body);
@@ -44,11 +45,13 @@ async function postToWebApp(url, body) {
     headers,
     body: payload,
     redirect: "manual",
+    signal: AbortSignal.timeout(SHEETS_TIMEOUT_MS),
   });
   const loc =
     r.status >= 300 && r.status < 400 ? r.headers.get("location") : null;
   if (loc) {
-    r = await fetch(loc, { method: "POST", headers, body: payload });
+    r = await fetch(loc, { method: "POST", headers, body: payload,
+                          signal: AbortSignal.timeout(SHEETS_TIMEOUT_MS), });
   }
   if (!r.ok) throw new Error("Sheets web app HTTP " + r.status);
 
