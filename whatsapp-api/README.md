@@ -20,7 +20,7 @@ Easynet's WhatsApp Business receives the structured lead
         ├──► Option A: Your team sees it and replies (works TODAY, zero cost)
         │
         └──► Option B: WhatsApp Cloud API (this folder) receives it via webhook,
-              stores it in leads/leads.csv automatically, and replies instantly
+              stores it in your Google Sheet automatically, and replies instantly
               with a thank-you — 24/7, even before a human sees it
 ```
 
@@ -83,11 +83,21 @@ curl -X POST http://localhost:3000/webhook -H 'Content-Type: application/json' -
 # view captured leads
 curl "http://localhost:3000/leads?token=easynet"
 ```
-Leads are saved to `leads/leads.csv` (open in Excel) and `leads/leads.jsonl`.
+Leads are saved to your **Google Sheet** (set `SHEETS_WEBAPP_URL` +
+`SHEETS_SECRET` from `../google-apps-script/Code.gs` — see step 4 below) or,
+when the Sheet is not configured, to `leads/leads.csv` + `leads/leads.jsonl`.
 
-### 4. Optional: store leads in a database
-`server.js` writes CSV + JSONL. When you add the website backend (Laravel/PHP),
-replace `saveLead()` with an INSERT into your `leads` table (prepared statement).
+### 4. Optional: store leads in a Google Sheet
+Add the two environment variables before starting the server:
+```bash
+export SHEETS_WEBAPP_URL="https://script.google.com/macros/s/.../exec"
+export SHEETS_SECRET="the-same-value-as-SHARED_SECRET-in-Code.gs"
+node server.js
+```
+Setup of the Sheet itself takes ~3 minutes — see `../google-apps-script/Code.gs`.
+WhatsApp leads land in the same "Leads" tab as website enquiries, with
+`source` = `whatsapp`. If the Sheet can't be reached, the lead is written to
+`leads/leads.csv` so nothing is ever lost.
 
 ## Privacy & compliance notes
 - Tell customers what you collect (your Contact page + Privacy section already

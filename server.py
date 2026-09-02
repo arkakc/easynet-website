@@ -8,6 +8,9 @@ Production-ready static server with:
   • Full security header set (CSP, HSTS, X-Frame-Options DENY, …)
   • Cache-Control (no-cache for HTML, 7-day for assets)
   • Correct 404/403 responses
+  • Contact form endpoint POST /api/contact → saves each enquiry to
+    your Google Sheet (google-apps-script/Code.gs) and emails it;
+    falls back to data/enquiries.csv if the Sheet is not configured
 
 Run:  python3 server.py [port]     (default 8000, binds 0.0.0.0)
 """
@@ -19,6 +22,10 @@ import re
 import smtplib
 import sys
 import threading
+import urllib.error
+import urllib.parse
+import urllib.request
+from datetime import datetime, timezone
 from email.message import EmailMessage
 from email.utils import formatdate
 
@@ -35,6 +42,10 @@ CSV_LOCK = threading.Lock()
 CONTACT_TO = os.environ.get("CONTACT_TO", "hello.easynet@hotmail.com")
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
 CONTACT_FROM = os.environ.get("CONTACT_FROM", "Easynet Website <onboarding@resend.dev>")
+# Google Sheets lead storage (see google-apps-script/Code.gs for setup).
+# Without SHEETS_WEBAPP_URL the server falls back to data/enquiries.csv.
+SHEETS_WEBAPP_URL = os.environ.get("SHEETS_WEBAPP_URL", "").strip()
+SHEETS_SECRET = os.environ.get("SHEETS_SECRET", "")
 SMTP_HOST = os.environ.get("SMTP_HOST", "")
 SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
 SMTP_USER = os.environ.get("SMTP_USER", "")
@@ -48,8 +59,66 @@ def _sanitize(value, limit=2000):
     return value.strip()[:limit]
 
 
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    """Surfaces 3xx responses so we can re-POST manually (see sheets_post)."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+# Apps Script Web Apps answer the first POST with a 302 redirect to a
+# one-time URL; urllib would follow it as a GET and lose the payload,
+# so we follow manually and POST the body again.
+def sheets_post(url, payload, timeout=15):
+    body = json.dumps(payload).encode("utf-8")
+    opener = urllib.request.build_opener(_NoRedirect)
+    for _ in range(5):
+        req = urllib.request.Request(
+            url, data=body, method="POST",
+            headers={"Content-Type": "text/plain;charset=utf-8"})
+        try:
+            with opener.open(req, timeout=timeout) as resp:
+                return json.loads(resp.read().decode("utf-8"))
+        except urllib.error.HTTPError as exc:
+            loc = exc.headers.get("Location") if exc.status in (301, 302, 303, 307, 308) else None
+            if not loc:
+                raise
+            url = urllib.parse.urljoin(url, loc)
+    raise RuntimeError("too many redirects from Apps Script web app")
+
+
+def save_enquiry_sheets(data, user_agent=""):
+    """Append the enquiry to the Google Sheet and return its sequence number.
+
+    Raises on any failure so the caller can fall back to the local CSV.
+    """
+    out = sheets_post(SHEETS_WEBAPP_URL, {
+        "secret": SHEETS_SECRET or None,
+        "source": "website",
+        "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "name": data.get("name", ""),
+        "company": data.get("company", ""),
+        "email": data.get("email", ""),
+        "phone": data.get("phone", ""),
+        "service": data.get("service", ""),
+        "message": data.get("message", ""),
+        "page": "/contact.html",
+        "user_agent": _sanitize(user_agent, 300),
+    })
+    if not isinstance(out, dict) or not out.get("ok"):
+        raise RuntimeError("Sheets web app error: %s" % (out or "empty response"))
+    seq = int(out["seq"])
+    if seq <= 0:
+        raise RuntimeError("Sheets web app returned no sequence number")
+    return seq
+
+
 def save_enquiry(data):
-    """Append the enquiry to data/enquiries.csv and return its sequence number."""
+    """Append the enquiry to data/enquiries.csv and return its sequence number.
+
+    Fallback storage — used only when the Google Sheet is unreachable
+    or SHEETS_WEBAPP_URL is not configured.
+    """
     with CSV_LOCK:
         os.makedirs(DATA_DIR, exist_ok=True)
         new_file = not os.path.isfile(ENQUIRIES_CSV)
@@ -57,7 +126,6 @@ def save_enquiry(data):
         if not new_file:
             with open(ENQUIRIES_CSV, newline="", encoding="utf-8") as f:
                 seq = sum(1 for _ in csv.reader(f))  # header counts as row 1 → next seq
-        from datetime import datetime, timezone
         row = [seq,
                datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
                data.get("name", ""), data.get("company", ""), data.get("email", ""),
@@ -72,7 +140,7 @@ def save_enquiry(data):
 
 def build_email(seq, data):
     msg = EmailMessage()
-    msg["Subject"] = "WEB Enquiry Sequence No. %d" % seq
+    msg["Subject"] = "WEB Enquiry Sequence No. %s" % seq
     msg["From"] = SMTP_USER or "website@easynetsolutions.com.pg"
     msg["To"] = CONTACT_TO
     msg["Date"] = formatdate(localtime=True)
@@ -81,7 +149,7 @@ def build_email(seq, data):
     msg.set_content(
         "New website enquiry — Easynet IT Solutions\n"
         "===========================================\n\n"
-        "Sequence No.  : %d\n"
+        "Sequence No.  : %s\n"
         "Name          : %s\n"
         "Company       : %s\n"
         "Email         : %s\n"
@@ -317,16 +385,31 @@ class SecureHandler(http.server.SimpleHTTPRequestHandler):
             self._json_response(400, {"ok": False, "error": "Missing or invalid fields.", "fields": missing})
             return
 
-        try:
-            seq = save_enquiry(data)
-        except OSError as exc:
-            sys.stderr.write("[csv] Failed to save enquiry: %s\n" % exc)
-            self._json_response(500, {"ok": False, "error": "Could not save enquiry."})
-            return
+        user_agent = self.headers.get("User-Agent", "") or ""
+        seq = None
+        stored_in = None
+        if SHEETS_WEBAPP_URL:
+            # Primary storage: append the row to the Google Sheet
+            try:
+                seq = save_enquiry_sheets(data, user_agent)
+                stored_in = "google-sheets"
+                sys.stderr.write("[sheets] Enquiry #%s appended to Google Sheet\n" % seq)
+            except Exception as exc:  # noqa: BLE001 — fall back so no lead is lost
+                sys.stderr.write("[sheets] Google Sheets save failed: %s\n" % exc)
+        if seq is None:
+            # Fallback: local CSV (also used when SHEETS_WEBAPP_URL is not set)
+            try:
+                seq = save_enquiry(data)
+                stored_in = "csv"
+                sys.stderr.write("[csv] Enquiry #%s appended to %s\n" % (seq, ENQUIRIES_CSV))
+            except OSError as exc:
+                sys.stderr.write("[csv] Failed to save enquiry: %s\n" % exc)
+                self._json_response(500, {"ok": False, "error": "Could not save enquiry."})
+                return
 
         # send the email in the background so the visitor gets an instant response
         threading.Thread(target=send_enquiry_email, args=(seq, data), daemon=True).start()
-        self._json_response(200, {"ok": True, "sequence_no": seq})
+        self._json_response(200, {"ok": True, "sequence_no": seq, "storage": stored_in})
 
 
 if __name__ == "__main__":

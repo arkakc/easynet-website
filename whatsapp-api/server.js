@@ -7,7 +7,9 @@
    • Receives WhatsApp messages (POST /webhook)
    • Parses the structured lead format from the website widget
      (or plain text enquiries)
-   • Stores every lead → leads/leads.csv + leads/leads.jsonl
+   • Stores every lead → Google Sheet (primary, when configured)
+     or leads/leads.csv + leads/leads.jsonl (offline fallback);
+     leads/leads.jsonl is always kept so GET /leads keeps working
    • Sends an automatic thank-you reply via the WhatsApp API
    • GET /leads  — view captured leads (token protected)
 
@@ -32,6 +34,10 @@ const LEADS_DIR = path.join(__dirname, "leads");
 const LEADS_CSV = path.join(LEADS_DIR, "leads.csv");
 const LEADS_JSONL = path.join(LEADS_DIR, "leads.jsonl");
 const LEADS_TOKEN = process.env.LEADS_ACCESS_TOKEN || "";
+// Google Sheets lead storage (see ../google-apps-script/Code.gs for setup).
+// Without SHEETS_WEBAPP_URL leads fall back to leads/leads.csv.
+const SHEETS_WEBAPP_URL = (process.env.SHEETS_WEBAPP_URL || "").trim();
+const SHEETS_SECRET = process.env.SHEETS_SECRET || "";
 
 const AUTO_REPLY =
   "✅ Thank you for contacting Easynet IT Solutions!\n\n" +
@@ -39,20 +45,70 @@ const AUTO_REPLY =
   "For anything urgent, visit: https://easynetsolutions.com.pg";
 
 /* ---------- storage ---------- */
+
+/* Google Apps Script Web Apps answer the first POST with a 302
+   redirect to a one-time URL; fetch() would follow it as a GET and
+   lose the payload, so we follow manually and POST the body again. */
+async function postToWebApp(url, body) {
+  const headers = { "Content-Type": "text/plain;charset=utf-8" };
+  const payload = JSON.stringify(body);
+  let r = await fetch(url, { method: "POST", headers, body: payload, redirect: "manual" });
+  const loc = r.status >= 300 && r.status < 400 ? r.headers.get("location") : null;
+  if (loc) r = await fetch(loc, { method: "POST", headers, body: payload });
+  if (!r.ok) throw new Error("Sheets web app HTTP " + r.status);
+  const out = await r.json().catch(() => null);
+  if (!out || out.ok !== true) throw new Error("Sheets web app error: " + JSON.stringify(out));
+  return out;
+}
+
+/* Append a lead to the Google Sheet (fire-and-forget — the Meta
+   webhook must be acknowledged within seconds, so we never block). */
+function saveLeadToSheets(lead) {
+  postToWebApp(SHEETS_WEBAPP_URL, {
+    secret: SHEETS_SECRET || undefined,
+    source: "whatsapp",
+    timestamp: lead.timestamp,
+    name: lead.name || "",
+    company: lead.company || "",
+    email: lead.email || "",
+    phone: lead.phone || "",
+    service: lead.service || "",
+    message: lead.message || "",
+    raw: (lead.raw || "").slice(0, 4000),
+  })
+    .then(out => console.log(`[sheets] lead ${lead.id} appended (seq ${out.seq})`))
+    .catch(err => {
+      console.error("[sheets] Google Sheets save failed, falling back to CSV:", err.message);
+      appendLeadFiles(lead); // don't lose the lead
+    });
+}
+
 function ensureStore() {
   if (!fs.existsSync(LEADS_DIR)) fs.mkdirSync(LEADS_DIR);
-  if (!fs.existsSync(LEADS_CSV)) fs.writeFileSync(LEADS_CSV, "id,timestamp,name,phone,email,company,service,message,raw\n");
 }
 function csvSafe(v) {
   v = String(v == null ? "" : v);
   return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
 }
-function saveLead(lead) {
-  lead.id = crypto.randomBytes(6).toString("hex").toUpperCase();
-  lead.timestamp = new Date().toISOString();
+function appendLeadFiles(lead) {
+  ensureStore();
+  if (!fs.existsSync(LEADS_CSV)) fs.writeFileSync(LEADS_CSV, "id,timestamp,name,phone,email,company,service,message,raw\n");
   fs.appendFileSync(LEADS_CSV,
     [lead.id, lead.timestamp, lead.name, lead.phone, lead.email, lead.company, lead.service, lead.message, lead.raw]
       .map(csvSafe).join(",") + "\n");
+}
+function saveLead(lead) {
+  lead.id = crypto.randomBytes(6).toString("hex").toUpperCase();
+  lead.timestamp = new Date().toISOString();
+  // Google Sheet is the primary store; CSV is only written when the
+  // Sheet is not configured (or as an emergency fallback on failure).
+  if (SHEETS_WEBAPP_URL) {
+    saveLeadToSheets(lead);
+  } else {
+    appendLeadFiles(lead);
+  }
+  // JSONL mirror — powers GET /leads
+  ensureStore();
   fs.appendFileSync(LEADS_JSONL, JSON.stringify(lead) + "\n");
   return lead;
 }
