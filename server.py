@@ -207,7 +207,7 @@ def send_enquiry_email(seq, data):
         f.write(bytes(msg))
     sys.stderr.write("[mail] Email not configured/failed — enquiry #%s saved to %s\n" % (seq, eml_path))
 
-CSP = ("default-src 'self'; script-src 'self'; style-src 'self'; "
+CSP = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; "
        "img-src 'self' data:; font-src 'self'; connect-src 'self'; "
        "object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'")
 

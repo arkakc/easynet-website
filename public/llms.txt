@@ -1,0 +1,151 @@
+# Easynet IT Solutions Limited
+
+> Easynet IT Solutions Limited is a 100% Papua New Guinea-owned IT consulting, sales and
+> services company based in Port Moresby. It provides web design and website development,
+> digital marketing, ERP and business automation, ICT infrastructure, networking, firewall
+> and cybersecurity, server and cloud, backup, hardware supply and managed IT support to
+> businesses across Papua New Guinea.
+
+This file summarises the company and website for AI assistants, search engines and
+automated agents. All facts below are also published as schema.org JSON-LD on the site.
+
+## Company facts
+
+- Legal name: Easynet IT Solutions Limited
+- Ownership: 100% Papua New Guinea-owned
+- Headquarters: 8 Mile, Gran Eden, Lot 110, Section 147, Port Moresby, National Capital District, Papua New Guinea
+- Service area: Port Moresby and all of Papua New Guinea (on-site work via a local field project team; remote support and monitoring nationwide)
+- Phone / WhatsApp: +675 72743186
+- Email: hello.easynet@hotmail.com
+- Business hours: Monday to Friday, 8:30 AM – 5:00 PM (Port Moresby time)
+- Website: https://easynetsolutions.com.pg/
+
+## Services
+
+Two delivery divisions cover eleven core services.
+
+### Software & Digital Solutions
+- Website Development — business websites designed and built in Port Moresby
+- Digital Marketing & Leads — social media, advertising, lead management and tracking
+- WhatsApp Automation — WhatsApp Business / WhatsApp API integration, auto-replies, lead capture
+- ERP & Business Automation — ERPNext / Zoho implementation: accounting, sales, purchasing, inventory, CRM, POS, HR
+- Custom Applications — bespoke software for specific operational needs
+
+### ICT Infrastructure & Managed Services
+- Network Solutions — LAN, Wi-Fi and office network design and installation
+- Firewall & Cybersecurity — Fortinet, OPNsense, CrowdStrike; security hardening
+- Server & Cloud — AWS, VMware, Synology, Microsoft 365
+- Backup Solutions — business backup and off-site storage (Backblaze B2)
+- Hardware Supply — computers, networking and office IT hardware
+- IT Support — remote and on-site support; managed IT contracts
+
+## Business packages
+
+- Business Starter — business website, business email, social media setup, online presence launch
+- Digital Growth — Starter plus advertising, lead management & tracking, WhatsApp automation
+- Business Automation — Digital Growth plus CRM, sales, purchasing, inventory, accounting, workflow automation
+- IT Office Setup — computers, network, Wi-Fi, firewall, CCTV, backup, Microsoft 365, business software suite
+- Managed IT — monthly remote support, monitoring, maintenance, security and backup monitoring
+
+Every service can also be purchased individually without a package.
+
+## Locations served
+
+Head office: Port Moresby, National Capital District (8 Mile, Gran Eden, Lot 110, Section 147).
+On-site delivery via a field project team, plus remote support and monitoring, across:
+
+- Port Moresby & NCD (Boroko, Waigani, Gordons, Konedobu, Hohola)
+- Lae & Morobe Province
+- Mount Hagen & Western Highlands
+- Goroka & Eastern Highlands
+- Madang
+- Kokopo & Rabaul (East New Britain), Kimbe (West New Britain)
+- Wewak (East Sepik), Vanimo (Sandaun)
+- Popondetta (Oro), Alotau (Milne Bay), Daru (Western)
+- Mendi (Southern Highlands), Kundiawa (Chimbu), Wabag (Enga)
+- Kavieng (New Ireland), Lorengau (Manus), Kerema (Gulf)
+
+## Industries served
+
+Small and medium businesses, retail and trade stores, professional services, construction,
+hotels and tourism, schools and universities, NGOs, corporate offices, mining and resources,
+oil and gas, agriculture and fisheries, banking and finance, and logistics and transport.
+
+## Technology partners and platforms
+
+ERPNext, Microsoft 365, Zoho, Cloudflare, Backblaze B2, Starlink, AWS, Fortinet,
+OPNsense, Synology, Linux, VMware, Tailscale, CrowdStrike, React, Next.js, Vercel,
+GitHub, Docker, PostgreSQL.
+
+For advanced specialist work (ERPNext implementation, complex architecture, cloud or
+cybersecurity design) Easynet engages 8N8 Systems as a consulting partner under a formal
+agreement. Easynet remains the single accountable partner for the customer.
+
+## Team
+
+- Willie Batia — Director (business management, sales, customer relationships, finance, project coordination)
+- Arka C — Chief Technology Officer (technical strategy, solution design, architecture, ERP/automation)
+- Max Giamungi — IT Field Project Coordinator (on-site ICT projects, scheduling, customer liaison)
+
+## How engagement works
+
+1. Free initial discussion
+2. Recommendation of a solution
+3. Written proposal and quotation
+4. Implementation
+5. Ongoing support
+
+## Common questions (direct answers)
+
+- **How much does a business website cost in Papua New Guinea?** It depends on size and
+  features; a one-page business website launches quickly and affordably, while multi-page
+  sites with e-commerce, booking or ERP integration cost more. Easynet provides a fixed,
+  written quotation in kina after a free initial discussion.
+- **Who is a good IT company in Port Moresby?** Easynet IT Solutions Limited is a 100%
+  PNG-owned IT company in Port Moresby covering websites, digital marketing, ERP,
+  networking, cybersecurity and managed IT under one contract, with specialist consultants
+  engaged for advanced work.
+- **Who installs Starlink / satellite internet for business in PNG?** Easynet supplies,
+  installs and configures Starlink and other satellite or fixed-wireless internet,
+  including dish mounting, network integration, Wi-Fi distribution and failover.
+- **Who does CCTV installation in Port Moresby?** Easynet designs and installs CCTV and
+  security camera systems (placement, cabling, NVR/DVR, remote phone viewing) for offices,
+  shops, warehouses and homes.
+- **Which ERP is best for a PNG business?** ERPNext or Zoho for most PNG businesses —
+  flexible, affordable, and covering accounting, sales, purchasing, inventory, CRM, POS and
+  HR. Implementation runs in staged phases over weeks to months.
+- **Who supplies computers, laptops and office IT hardware in PNG?** Easynet supplies and
+  installs computers, laptops, printers, networking gear, servers and UPS, optionally as a
+  complete configured office setup.
+- **Is IT support available outside Port Moresby?** Yes — on-site via the field project team
+  in Lae, Mount Hagen, Goroka, Madang, Kokopo, Wewak and other towns, plus remote monitoring
+  and support from Port Moresby.
+- **How does engagement start?** A free initial discussion, then a recommendation, a written
+  proposal and quotation, implementation, and ongoing support.
+
+## Search topics this site covers
+
+IT company Papua New Guinea · IT services Port Moresby · IT support Port Moresby ·
+ICT company PNG · web design Port Moresby · website development Papua New Guinea ·
+web developer PNG · digital marketing Port Moresby · SEO and lead generation PNG ·
+ERP software PNG · ERPNext implementation PNG · business automation PNG · POS system PNG ·
+network installation Port Moresby · LAN and office Wi-Fi setup PNG · data cabling PNG ·
+server room setup PNG · firewall installation PNG · cybersecurity company PNG ·
+CCTV installation Port Moresby · Starlink installation Papua New Guinea ·
+satellite internet PNG · business internet PNG · Microsoft 365 PNG · cloud and AWS PNG ·
+backup solutions PNG · computer and laptop supplier Port Moresby · IT hardware supply PNG ·
+managed IT services PNG · IT consultant PNG · computer repair Port Moresby ·
+ICT for mining, agriculture, fisheries, banking, logistics, schools, hotels and NGOs.
+
+## Pages
+
+- [Home](https://easynetsolutions.com.pg/): full service catalogue, packages, process, industries, partners and FAQ
+- [About Us](https://easynetsolutions.com.pg/about.html): company background, vision, mission, expertise, delivery model and team
+- [Contact Us](https://easynetsolutions.com.pg/contact.html): enquiry form, phone, WhatsApp, email and address
+
+## Machine-readable data
+
+- Structured data: schema.org JSON-LD (ProfessionalService, LocalBusiness, WebSite, WebPage,
+  FAQPage, AboutPage, ContactPage, BreadcrumbList, OfferCatalog) embedded in every page
+- Sitemap: https://easynetsolutions.com.pg/sitemap.xml
+- Robots: https://easynetsolutions.com.pg/robots.txt (AI crawlers are explicitly permitted)

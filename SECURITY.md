@@ -20,6 +20,14 @@
 | Cache policy: HTML no-cache, assets 7 days | all configs | ✅ |
 | Zero third-party scripts (no analytics/CDN = no supply-chain risk) | whole site | ✅ |
 
+> **CSP note — deliberate exception:** `script-src 'self'` is kept fully strict
+> (no inline JavaScript anywhere; all behaviour lives in `assets/js/*.js`).
+> `style-src` is `'self' 'unsafe-inline'` **on purpose**: the design uses ~70
+> inline `style=""` attributes for layout spacing, and blocking them would break
+> the rendered page. Inline *style* is a low-risk vector (CSS only, no script
+> execution); inline *script* remains blocked. Do not "fix" this back to
+> `'self'` alone without first moving every inline style attribute into CSS.
+
 ## 2. Hosting (do at the server level)
 
 1. **Force HTTPS everywhere** — use Let's Encrypt (free) or Cloudflare's SSL.

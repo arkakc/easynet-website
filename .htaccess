@@ -1,0 +1,68 @@
+# ============================================================
+# Easynet IT Solutions — Apache / LiteSpeed (cPanel) config
+# Mirrors the security headers and caching in vercel.json,
+# nginx.conf.example and server.py so every hosting option
+# (Vercel / nginx / Apache / Python) behaves identically.
+# Requires: mod_headers, mod_rewrite. mod_expires optional.
+# ============================================================
+
+# ---- Never list directories ----
+Options -Indexes
+
+# ---- Custom error page ----
+ErrorDocument 404 /404.html
+
+<IfModule mod_headers.c>
+  # ---- Security headers (every response) ----
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "DENY"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()"
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+  Header always set Cross-Origin-Opener-Policy "same-origin"
+  Header always set Cross-Origin-Resource-Policy "same-origin"
+  Header always unset X-Powered-By
+
+  # ---- Caching: HTML uncached, static assets 7 days ----
+  <FilesMatch "\.(html)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+  <FilesMatch "\.(css|js|png|jpe?g|webp|svg|ico|woff2?|webmanifest|xml|txt)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/html                 "access plus 0 seconds"
+  ExpiresByType text/css                  "access plus 7 days"
+  ExpiresByType application/javascript    "access plus 7 days"
+  ExpiresByType text/javascript           "access plus 7 days"
+  ExpiresByType image/png                 "access plus 7 days"
+  ExpiresByType image/jpeg                "access plus 7 days"
+  ExpiresByType image/webp                "access plus 7 days"
+  ExpiresByType image/svg+xml             "access plus 7 days"
+  ExpiresByType image/x-icon              "access plus 7 days"
+  ExpiresByType image/vnd.microsoft.icon  "access plus 7 days"
+  ExpiresByType font/woff2                "access plus 7 days"
+</IfModule>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Block dotfiles & dot-directories, EXCEPT /.well-known/security.txt (RFC 9116)
+  RewriteRule (^|/)\.(?!well-known/security\.txt$) - [R=404,L]
+</IfModule>
+
+# ---- Block sensitive file types from ever being served ----
+<FilesMatch "\.(md|sql|bak|log|env|py|sh|conf|ini|json|key|pem|p12|crt|cert|tar|gz|zip|htaccess)$">
+  Require all denied
+</FilesMatch>
+
+# ---- Correct MIME types for the manifest / modern assets ----
+<IfModule mod_mime.c>
+  AddType application/manifest+json .webmanifest
+  AddType image/svg+xml             .svg
+  AddType font/woff2                .woff2
+</IfModule>
