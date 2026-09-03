@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Easynet IT Solutions — Secure Multi-Site Connectivity Proposal</title>
+<style>
+/*@@FONTS@@*/
+:root{
+  --navy-950:#04101F; --navy-900:#061A33; --navy-800:#0A2547;
+  --blue-700:#0B4EA2; --blue-600:#0658C9; --blue-500:#1473E8;
+  --blue-100:#DCEBFB; --blue-50:#EFF6FE;
+  --green-600:#689F38; --green-500:#7CB342; --green-100:#EAF3DC;
+  --amber:#E8A33D; --amber-100:#FCF0DC;
+  --red-500:#D64545; --red-100:#FBE7E7;
+  --ink-900:#0B1B33; --slate-600:#4A5A74; --slate-500:#64748B;
+  --bg-light:#F5F8FC; --line:#E3EAF4; --white:#fff;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+html,body{background:#DDE4EE}
+body{font-family:'Inter','Segoe UI',sans-serif;color:var(--ink-900);font-size:12.5px;line-height:1.55}
+.toolbar{position:sticky;top:0;z-index:50;background:var(--navy-950);color:#fff;display:flex;align-items:center;gap:14px;justify-content:center;padding:10px 16px;font-size:13px}
+.toolbar b{color:var(--green-500)}
+.toolbar button{background:var(--blue-600);border:0;color:#fff;font:700 13px 'Inter',sans-serif;padding:8px 16px;border-radius:8px;cursor:pointer}
+@media print{.toolbar{display:none}}
+
+@page{size:A4;margin:0}
+.page{width:210mm;height:297mm;position:relative;overflow:hidden;background:#fff;page-break-after:always;margin:0 auto 6mm;box-shadow:0 8px 30px rgba(4,16,31,.25)}
+.page:last-child{page-break-after:auto;margin-bottom:0}
+.pad{padding:11mm 13mm 10mm}
+h1,h2,h3,h4{color:var(--ink-900)}
+p{color:var(--slate-600)}
+strong{color:var(--ink-900)}
+
+/* page chrome */
+.chead{display:flex;align-items:center;justify-content:space-between;padding:0 0 4mm;border-bottom:2px solid var(--line);margin-bottom:6mm}
+.chead .mark{background:var(--navy-900);border-radius:8px;padding:5px 12px;display:inline-flex}
+.chead .mark img{height:20px;width:auto;display:block}
+.chead .doc{font-size:9.5px;color:var(--slate-500);text-align:right;line-height:1.5}
+.chead .doc b{color:var(--blue-600);letter-spacing:.08em}
+.cfoot{position:absolute;left:13mm;right:13mm;bottom:6mm;display:flex;justify-content:space-between;align-items:center;font-size:9px;color:var(--slate-500);border-top:1px solid var(--line);padding-top:3mm}
+.cfoot .b{font-weight:700;color:var(--blue-600)}
+
+/* section head */
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:9.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--blue-600);margin-bottom:2.5mm}
+.eyebrow::before{content:"";width:22px;height:2px;background:linear-gradient(90deg,var(--blue-600),var(--green-500));border-radius:2px}
+h2.st{font-size:21px;font-weight:800;letter-spacing:-.02em;line-height:1.2;margin-bottom:2mm}
+.lede{font-size:12.5px;color:var(--slate-600);max-width:178mm}
+.rule{height:3px;width:56px;border-radius:2px;background:linear-gradient(90deg,var(--blue-500),var(--green-500));margin:2mm 0 5mm}
+
+/* generic cards */
+.cards{display:flex;gap:4mm;flex-wrap:wrap}
+.card{flex:1 1 30%;background:var(--bg-light);border:1px solid var(--line);border-radius:4mm;padding:4mm 4.5mm}
+.card h4{font-size:12px;font-weight:800;margin:0 0 1.5mm}
+.card p{font-size:10.5px;line-height:1.5}
+.chip{display:inline-block;font-size:9px;font-weight:800;letter-spacing:.06em;border-radius:999px;padding:1.2mm 3mm;margin:0 1mm 1mm 0}
+.chip.blue{background:var(--blue-100);color:var(--blue-700)}
+.chip.green{background:var(--green-100);color:var(--green-600)}
+.chip.amber{background:var(--amber-100);color:#9A6414}
+.chip.red{background:var(--red-100);color:#A33}
+
+/* stats */
+.stats{display:flex;gap:4mm;margin:5mm 0}
+.stat{flex:1;background:var(--navy-900);border-radius:4mm;padding:4.5mm 4mm;color:#fff;text-align:center}
+.stat .n{font-size:20px;font-weight:800;letter-spacing:-.02em;color:#fff}
+.stat .n em{font-style:normal;color:var(--green-500)}
+.stat .l{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:#9FB3D1;margin-top:1mm}
+.stat .l2{font-size:10.5px;font-weight:800;color:var(--green-500);margin-top:1mm;letter-spacing:.04em}
+
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:10.5px}
+th{background:var(--navy-900);color:#fff;text-align:left;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;padding:2.6mm 3mm;font-weight:700}
+td{padding:2.4mm 3mm;border-bottom:1px solid var(--line);vertical-align:top;color:var(--slate-600)}
+td b{color:var(--ink-900)}
+tr:nth-child(even) td{background:#F8FAFD}
+.t-yes{color:var(--green-600);font-weight:800}
+.t-no{color:var(--red-500);font-weight:800}
+.t-part{color:#9A6414;font-weight:800}
+
+/* numbered lists */
+ol.nice{margin:2mm 0 0 5mm}
+ol.nice li{margin-bottom:1.6mm;color:var(--slate-600)}
+ol.nice li b{color:var(--ink-900)}
+
+/* diagram box */
+.fig{border:1px solid var(--line);border-radius:4mm;background:#FBFCFE;padding:3mm;margin:4mm 0 2mm}
+.figcap{display:flex;align-items:center;gap:2mm;font-size:9px;color:var(--slate-500);margin-top:2mm}
+.figcap .tag{background:var(--blue-50);color:var(--blue-700);font-weight:800;border-radius:999px;padding:1mm 3mm;letter-spacing:.06em}
+svg text{font-family:'Inter','Segoe UI',sans-serif}
+
+/* benefits */
+.bgrid{display:flex;flex-wrap:wrap;gap:4mm;margin-top:4mm}
+.bcard{flex:1 1 46%;border:1px solid var(--line);border-left:3px solid var(--blue-500);border-radius:3mm;padding:3.5mm 4mm;background:#fff;box-shadow:0 1px 6px rgba(6,26,51,.05)}
+.bcard.g{border-left-color:var(--green-500)}
+.bcard h4{font-size:11.5px;font-weight:800;margin-bottom:1mm}
+.bcard p{font-size:10px;line-height:1.5}
+
+/* toc */
+.toc{margin-top:4mm}
+.toc .row{display:flex;align-items:baseline;gap:3mm;padding:2.2mm 0;border-bottom:1px dashed var(--line);font-size:11.5px}
+.toc .row .no{font-weight:800;color:var(--blue-600);width:7mm}
+.toc .row .t{color:var(--ink-900);font-weight:600}
+.toc .row .dots{flex:1;border-bottom:2px dotted var(--line);transform:translateY(-1.5mm)}
+.toc .row .pg{color:var(--slate-500);font-weight:600}
+
+/* signatures */
+.sig{display:flex;gap:6mm;margin-top:6mm}
+.sig .box{flex:1;border:1px solid var(--line);border-radius:3mm;padding:4mm}
+.sig .box h4{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-500);margin-bottom:6mm}
+.sig .line{border-bottom:1px solid var(--ink-900);height:8mm;margin-bottom:1.5mm}
+.sig .lbl{font-size:9px;color:var(--slate-500)}
+
+/* cover */
+.cover{background:linear-gradient(155deg,#04101F 0%,#061A33 48%,#0A2547 100%);color:#fff}
+.cover .top{display:flex;justify-content:space-between;align-items:flex-start;padding:12mm 13mm 0}
+.cover .docno{font-size:9.5px;color:#9FB3D1;text-align:right;line-height:1.6}
+.cover .docno b{color:var(--green-500)}
+.cover .mid{position:absolute;left:13mm;right:13mm;top:64mm}
+.cover h1{color:#fff;font-size:31px;line-height:1.14;font-weight:800;letter-spacing:-.02em}
+.cover h1 em{font-style:normal;color:var(--green-500)}
+.cover .sub{margin-top:5mm;font-size:13.5px;color:#B9C9E2;max-width:150mm;line-height:1.6}
+.cover .for{margin-top:9mm;display:inline-block;border:1px solid rgba(124,179,66,.5);background:rgba(124,179,66,.10);border-radius:3mm;padding:3mm 5mm}
+.cover .for .l{font-size:8.5px;letter-spacing:.18em;color:var(--green-500);font-weight:800}
+.cover .for .v{font-size:13px;font-weight:700;color:#fff;margin-top:1mm}
+.cover .meta{position:absolute;left:13mm;right:13mm;bottom:12mm;border-top:1px solid rgba(255,255,255,.18);padding-top:4mm;display:flex;justify-content:space-between;gap:6mm;font-size:9.5px;color:#9FB3D1}
+.cover .meta b{color:#fff}
+.cover .orbit{position:absolute;right:-40mm;top:26mm;opacity:.5}
+</style>
+</head>
+<body>
+
+<div class="toolbar"><span><b>Easynet proposal</b> — print-ready A4 · use the button for a PDF copy</span> <button onclick="window.print()">Save as PDF</button></div>
+
+<!-- ============ PAGE 1 · COVER ============ -->
+<section class="page cover">
+  <svg class="orbit" width="460" height="460" viewBox="0 0 460 460" fill="none">
+    <circle cx="230" cy="230" r="150" stroke="#1E3A66" stroke-width="1.4" stroke-dasharray="3 7"/>
+    <circle cx="230" cy="230" r="205" stroke="#16305A" stroke-width="1.2" stroke-dasharray="2 8"/>
+    <circle cx="230" cy="230" r="95" stroke="#24466F" stroke-width="1.2"/>
+    <circle cx="230" cy="80" r="7" fill="#7CB342"/>
+    <circle cx="381" cy="305" r="6" fill="#1473E8"/>
+    <circle cx="112" cy="300" r="5" fill="#E8A33D"/>
+    <path d="M230 80 L381 305 M381 305 L112 300 M112 300 L230 80" stroke="#1E3A66" stroke-width="1"/>
+  </svg>
+  <div class="top">
+    <img src="@@LOGO@@" alt="Easynet IT Solutions Limited" style="height:44px;width:auto">
+    <div class="docno">
+      <b>PROPOSAL · EN-PRP-2026-014</b><br>
+      Issue date: 4 September 2026<br>
+      Valid until: 4 October 2026<br>
+      Classification: Commercial in confidence
+    </div>
+  </div>
+  <div class="mid">
+    <span class="chip green" style="background:rgba(124,179,66,.15);color:#A6D46B;letter-spacing:.18em">NETWORK PROPOSAL</span>
+    <h1>Connect every branch to head office.<br><em>Securely. Automatically.</em><br>Without MPLS costs.</h1>
+    <p class="sub">Private site-to-site and multi-site connectivity over Starlink, protected by
+       enterprise SD-WAN — engineered, installed and managed in Papua New Guinea by
+       Easynet IT Solutions Limited.</p>
+    <div class="for">
+      <div class="l">PREPARED FOR</div>
+      <div class="v">[Client company name] — [Attention: CEO / General Manager]</div>
+    </div>
+  </div>
+  <div class="meta">
+    <span><b>Easynet IT Solutions Limited</b><br>8 Mile, Gran Eden, Lot 110, Section 147<br>Port Moresby, NCD, Papua New Guinea</span>
+    <span><b>+675 72743186</b><br>hello.easynet@hotmail.com<br>easynetpng.com</span>
+    <span><b>100% Papua New Guinea-owned</b><br>IT consulting · infrastructure ·<br>cybersecurity · managed services</span>
+  </div>
+</section>
+
+<!-- ============ PAGE 2 · EXECUTIVE SUMMARY ============ -->
+<section class="page"><div class="pad">
+  <div class="chead"><span class="mark"><img src="@@LOGO@@" alt="Easynet"></span>
+    <div class="doc"><b>EN-PRP-2026-014</b><br>Secure multi-site connectivity · SD-WAN over Starlink</div></div>
+  <span class="eyebrow">Executive summary</span>
+  <h2 class="st">One private network for your whole business</h2>
+  <div class="rule"></div>
+  <p class="lede">This proposal sets out how Easynet IT Solutions will connect your head office and every branch,
+     warehouse, mine site or retail outlet into <strong>one private, encrypted network</strong> — using Starlink
+     satellite internet wrapped in enterprise <strong>SD-WAN</strong> technology. It behaves like a private MPLS
+     circuit (the technology banks and telcos have used for 20 years): encrypted, application-aware and highly
+     reliable — but deployed in <strong>days, not months</strong>, at a fraction of the recurring cost, and available
+     <strong>anywhere in Papua New Guinea</strong> where the sky is visible.</p>
+
+  <div class="stats">
+    <div class="stat"><div class="n">Days</div><div class="l2">not months</div><div class="l">typical deployment per site</div></div>
+    <div class="stat"><div class="n">2×<em> paths</em></div><div class="l">Starlink + your existing circuit, managed as one</div></div>
+    <div class="stat"><div class="n">0<em> human</em></div><div class="l">intervention needed when a link fails</div></div>
+    <div class="stat"><div class="n">1<em> contract</em></div><div class="l">Easynet accountable end-to-end</div></div>
+  </div>
+
+  <p style="margin-bottom:4mm">Three ideas make it work:</p>
+  <div class="cards">
+    <div class="card"><h4>1 · Private by design</h4><p>Your traffic travels in encrypted tunnels over Starlink and any internet path — invisible to the public internet, like an armoured private lane on a public highway.</p></div>
+    <div class="card"><h4>2 · Intelligent steering</h4><p>The network knows your applications. ERP, phone calls and card payments get the priority lane; backups and downloads travel in the gaps.</p></div>
+    <div class="card"><h4>3 · Self-healing</h4><p>If any circuit degrades or fails, critical traffic shifts to the surviving path in seconds. Staff notice nothing. There is no 2 a.m. phone call.</p></div>
+  </div>
+
+  <div style="margin-top:6mm">
+    <span class="eyebrow">Contents</span>
+    <div class="toc">
+      <div class="row"><span class="no">03</span><span class="t">The problem with traditional MPLS in PNG</span><span class="dots"></span><span class="pg">3</span></div>
+      <div class="row"><span class="no">04</span><span class="t">The solution — SD-WAN over Starlink, in plain English</span><span class="dots"></span><span class="pg">4</span></div>
+      <div class="row"><span class="no">05</span><span class="t">What happens when a circuit fails</span><span class="dots"></span><span class="pg">5</span></div>
+      <div class="row"><span class="no">06</span><span class="t">Side-by-side: traditional MPLS vs Easynet SD-WAN</span><span class="dots"></span><span class="pg">6</span></div>
+      <div class="row"><span class="no">07</span><span class="t">Reference architecture — what we install where</span><span class="dots"></span><span class="pg">7</span></div>
+      <div class="row"><span class="no">08</span><span class="t">Business benefits</span><span class="dots"></span><span class="pg">8</span></div>
+      <div class="row"><span class="no">09</span><span class="t">Implementation plan &amp; timeline</span><span class="dots"></span><span class="pg">9</span></div>
+      <div class="row"><span class="no">10</span><span class="t">Investment &amp; commercial model</span><span class="dots"></span><span class="pg">10</span></div>
+      <div class="row"><span class="no">11</span><span class="t">Why Easynet · service commitment</span><span class="dots"></span><span class="pg">11</span></div>
+      <div class="row"><span class="no">12</span><span class="t">Assumptions, next steps &amp; acceptance</span><span class="dots"></span><span class="pg">12</span></div>
+      <div class="row"><span class="no">13</span><span class="t">Appendix — plain-English glossary</span><span class="dots"></span><span class="pg">13</span></div>
+    </div>
+  </div>
+  <div class="cfoot"><span><span class="b">EASYNET IT SOLUTIONS LIMITED</span> · Commercial in confidence</span><span>Page 2 of 13</span></div>
+</div></section>
+
+<!-- ============ PAGE 3 · THE PROBLEM ============ -->
+<section class="page"><div class="pad">
+  <div class="chead"><span class="mark"><img src="@@LOGO@@" alt="Easynet"></span>
+    <div class="doc"><b>EN-PRP-2026-014</b><br>Secure multi-site connectivity · SD-WAN over Starlink</div></div>
+  <span class="eyebrow">01 · The challenge</span>
+  <h2 class="st">Why connecting branches in PNG is harder — and more expensive — than it should be</h2>
+  <div class="rule"></div>
+  <p class="lede">Most PNG businesses with more than one location connect them the 2005 way: <strong>telco MPLS circuits</strong>.
+     Each branch rents a small leased line (commonly 2–5 Mbps) that is carried over long-distance backhaul to Port Moresby.
+     It works — until you look closely at what you are actually paying for.</p>
+
+  <div class="fig">
+    <svg viewBox="0 0 700 210" width="100%">
+      <rect x="14" y="78" width="118" height="54" rx="8" fill="#fff" stroke="#C9D6E8"/>
+      <text x="73" y="100" font-size="11" font-weight="700" fill="#0B1B33" text-anchor="middle">Branch · e.g. Alotau</text>
+      <text x="73" y="116" font-size="9" fill="#64748B" text-anchor="middle">staff · POS · phones</text>
+      <rect x="14" y="152" width="118" height="44" rx="8" fill="#fff" stroke="#C9D6E8"/>
+      <text x="73" y="170" font-size="11" font-weight="700" fill="#0B1B33" text-anchor="middle">Branch · e.g. Lae</text>
+      <text x="73" y="184" font-size="9" fill="#64748B" text-anchor="middle">staff · POS · phones</text>
+      <path d="M132 105 C 210 105, 230 105, 300 105" stroke="#94A7C4" stroke-width="1.6" fill="none"/>
+      <path d="M132 174 C 210 174, 230 122, 300 118" stroke="#94A7C4" stroke-width="1.6" fill="none"/>
+      <text x="214" y="96" font-size="8.5" fill="#A33" text-anchor="middle">2–5 Mbps leased line</text>
+      <text x="214" y="190" font-size="8.5" fill="#A33" text-anchor="middle">2–5 Mbps leased line</text>
+      <ellipse cx="395" cy="110" rx="98" ry="52" fill="#EEF2F8" stroke="#B9C7DC" stroke-dasharray="5 4"/>
+      <text x="395" y="98" font-size="11" font-weight="700" fill="#4A5A74" text-anchor="middle">Telco MPLS network</text>
+      <text x="395" y="114" font-size="8.8" fill="#64748B" text-anchor="middle">long-haul backhaul ·</text>
+      <text x="395" y="126" font-size="8.8" fill="#64748B" text-anchor="middle">congestion · packet loss</text>
+      <path d="M493 110 C 540 110, 550 110, 580 110" stroke="#94A7C4" stroke-width="1.6" fill="none"/>
+      <rect x="580" y="78" width="106" height="64" rx="8" fill="#061A33"/>
+      <text x="633" y="104" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">Head Office</text>
+      <text x="633" y="120" font-size="9" fill="#9FB3D1" text-anchor="middle">Port Moresby</text>
+      <g font-size="8.6">
+        <rect x="150" y="14" width="176" height="20" rx="10" fill="#FBE7E7"/><text x="238" y="27" fill="#A33" text-anchor="middle" font-weight="700">Premium monthly fee — per site, per circuit</text>
+        <rect x="338" y="14" width="170" height="20" rx="10" fill="#FCF0DC"/><text x="423" y="27" fill="#9A6414" text-anchor="middle" font-weight="700">Weeks–months to order a new circuit</text>
+        <rect x="520" y="14" width="150" height="20" rx="10" fill="#FBE7E7"/><text x="595" y="27" fill="#A33" text-anchor="middle" font-weight="700">One path — no automatic backup</text>
+      </g>
+    </svg>
+    <div class="figcap"><span class="tag">FIG 1</span> The traditional model: every branch rents a small, expensive circuit with a single point of failure.</div>
+  </div>
+
+  <div class="cards" style="margin-top:5mm">
+    <div class="card"><h4>Paying premium prices for small pipes</h4><p>A leased MPLS circuit costs like a premium product but often delivers a few congested megabits. You pay the same monthly fee on good days and bad days.</p></div>
+    <div class="card"><h4>Growth waits on the telco</h4><p>Opening a new branch means ordering a circuit and waiting weeks or months. Meanwhile the new site runs on paperwork and patience, not live systems.</p></div>
+    <div class="card"><h4>Outages hit the P&amp;L directly</h4><p>When the circuit drops, the branch can't sell, can't sync stock, can't process cards. Every silent hour is unrecorded revenue and idle staff.</p></div>
+    <div class="card"><h4>No visibility, no control</h4><p>When something is slow, nobody can say whether it's the branch, the backhaul or the head office. Problems become blame, and blame becomes downtime.</p></div>
+    <div class="card"><h4>Remote sites simply can't get it</h4><p>Mine sites, farms, islands and rural stations outside the fibre footprint are offered nothing at all — or a microwave link that fades in weather.</p></div>
+    <div class="card"><h4>“Backup” usually means a phone call</h4><p>Without automatic failover, an outage becomes a 2 a.m. phone call and a manual reconfiguration — if anyone knows how.</p></div>
+  </div>
+  <div class="cfoot"><span><span class="b">EASYNET IT SOLUTIONS LIMITED</span> · Commercial in confidence</span><span>Page 3 of 13</span></div>
+</div></section>
+
+<!-- ============ PAGE 4 · THE SOLUTION ============ -->
+<section class="page"><div class="pad">
+  <div class="chead"><span class="mark"><img src="@@LOGO@@" alt="Easynet"></span>
+    <div class="doc"><b>EN-PRP-2026-014</b><br>Secure multi-site connectivity · SD-WAN over Starlink</div></div>
+  <span class="eyebrow">02 · The solution</span>
+  <h2 class="st">Starlink + SD-WAN: a private MPLS-grade network, built in days</h2>
+  <div class="rule"></div>
+  <p class="lede"><strong>In plain English:</strong> the public internet is a highway open to everyone. SD-WAN
+     (<em>Software-Defined Wide Area Networking</em>) builds a <strong>private, armoured lane</strong> on that highway —
+     reserved for your traffic, encrypted end-to-end, with a <strong>traffic controller</strong> that decides which of
+     your applications goes first. Starlink provides the on-ramp: high-capacity satellite internet available at
+     <em>any</em> site in PNG. Your existing MPLS or 4G circuits are not ripped out — they are kept and managed as
+     extra paths. <strong>Complement, not replace.</strong></p>
+
+  <div class="fig">
+    <svg viewBox="0 0 700 320" width="100%">
+      <g><rect x="316" y="36" width="16" height="12" rx="2" fill="#1473E8"/><rect x="368" y="36" width="16" height="12" rx="2" fill="#1473E8"/><circle cx="350" cy="42" r="13" fill="#0A2547" stroke="#7CB342" stroke-width="1.6"/><path d="M343 42 a7 7 0 0 1 14 0" stroke="#7CB342" stroke-width="1.3" fill="none"/>
+      <text x="350" y="18" font-size="9.6" font-weight="700" fill="#0B1B33" text-anchor="middle">Low-earth-orbit satellite constellation (Starlink)</text></g>
+      <g stroke="#1473E8" stroke-width="2">
+        <path d="M338 52 L120 150"/><path d="M344 54 L275 150"/><path d="M356 54 L425 150"/><path d="M362 52 L580 150"/>
+      </g>
+      <g font-size="8.2" fill="#0B4EA2" font-weight="700">
+        <text x="198" y="112" text-anchor="middle" transform="rotate(-24 198 112)">encrypted SD-WAN tunnel</text>
+        <text x="502" y="112" text-anchor="middle" transform="rotate(24 502 112)">encrypted SD-WAN tunnel</text>
+      </g>
+      <g>
+        <rect x="60" y="150" width="120" height="58" rx="9" fill="#fff" stroke="#0658C9" stroke-width="1.6"/>
+        <text x="120" y="172" font-size="10.5" font-weight="700" fill="#0B1B33" text-anchor="middle">Branch · Lae</text>
+        <text x="120" y="187" font-size="8.6" fill="#64748B" text-anchor="middle">dish + SD-WAN edge</text>
+        <rect x="215" y="150" width="120" height="58" rx="9" fill="#fff" stroke="#0658C9" stroke-width="1.6"/>
+        <text x="275" y="172" font-size="10.5" font-weight="700" fill="#0B1B33" text-anchor="middle">Branch · Alotau</text>
+        <text x="275" y="187" font-size="8.6" fill="#64748B" text-anchor="middle">dish + SD-WAN edge</text>
+        <rect x="365" y="150" width="120" height="58" rx="9" fill="#fff" stroke="#0658C9" stroke-width="1.6"/>
+        <text x="425" y="172" font-size="10.5" font-weight="700" fill="#0B1B33" text-anchor="middle">Branch · Mt Hagen</text>
+        <text x="425" y="187" font-size="8.6" fill="#64748B" text-anchor="middle">dish + SD-WAN edge</text>
+        <rect x="520" y="150" width="120" height="58" rx="9" fill="#fff" stroke="#0658C9" stroke-width="1.6"/>
+        <text x="580" y="172" font-size="10.5" font-weight="700" fill="#0B1B33" text-anchor="middle">Mine / rural site</text>
+        <text x="580" y="187" font-size="8.6" fill="#64748B" text-anchor="middle">dish + SD-WAN edge</text>
+      </g>
+      <path d="M120 208 C 120 236, 300 246, 330 246 M275 208 C 275 232, 320 246, 340 246 M425 208 C 425 232, 390 246, 370 246 M580 208 C 580 236, 400 246, 380 246" stroke="#94A7C4" stroke-width="1.4" stroke-dasharray="5 4" fill="none"/>
+      <rect x="280" y="246" width="140" height="42" rx="9" fill="#061A33"/>
+      <text x="350" y="264" font-size="10.5" font-weight="700" fill="#fff" text-anchor="middle">Head Office hub</text>
+      <text x="350" y="278" font-size="8.6" fill="#9FB3D1" text-anchor="middle">core firewall · SD-WAN controller</text>
+      <g font-size="8.6">
+        <rect x="18" y="296" width="150" height="16" rx="8" fill="#DCEBFB"/><text x="93" y="307" fill="#0B4EA2" font-weight="700" text-anchor="middle">solid blue = private satellite path</text>
+        <rect x="176" y="296" width="150" height="16" rx="8" fill="#EEF2F8"/><text x="251" y="307" fill="#64748B" font-weight="700" text-anchor="middle">dashed = existing MPLS retained</text>
+        <rect x="334" y="296" width="160" height="16" rx="8" fill="#EAF3DC"/><text x="414" y="307" fill="#689F38" font-weight="700" text-anchor="middle">failover is automatic, in seconds</text>
+      </g>
+    </svg>
+    <div class="figcap"><span class="tag">FIG 2</span> Hub-and-spoke: every site — city or remote — joins the same private network through its own Starlink path.</div>
+  </div>
+
+  <div class="cards">
+    <div class="card"><h4>Anywhere in PNG</h4><p>If a site can see the sky, it can join your private network — islands, highlands, mine sites, farms, rural stations.</p></div>
+    <div class="card"><h4>MPLS-grade behaviour</h4><p>Encrypted tunnels, application priority and steady performance — the properties you were promised by MPLS, delivered over satellite.</p></div>
+    <div class="card"><h4>Live in days</h4><p>A dish and an edge appliance are installed and commissioned in a site visit — no civil works, no telco lead times.</p></div>
+  </div>
+  <div class="cfoot"><span><span class="b">EASYNET IT SOLUTIONS LIMITED</span> · Commercial in confidence</span><span>Page 4 of 13</span></div>
+</div></section>
+
+<!-- ============ PAGE 5 · RESILIENCE ============ -->
+<section class="page"><div class="pad">
+  <div class="chead"><span class="mark"><img src="@@LOGO@@" alt="Easynet"></span>
+    <div class="doc"><b>EN-PRP-2026-014</b><br>Secure multi-site connectivity · SD-WAN over Starlink</div></div>
+  <span class="eyebrow">03 · Resilience</span>
+  <h2 class="st">When a circuit fails, your business doesn't notice</h2>
+  <div class="rule"></div>
+  <p class="lede">Resilience is not bought off the shelf — it is engineered. Every site runs <strong>at least two independent
+     paths</strong> (Starlink plus your existing MPLS or a 4G backup). The SD-WAN controller probes every path continuously,
+     duplicates your most critical packets across both, and shifts traffic the moment a path degrades. <strong>No leased-line
+     dependency, no human in the loop.</strong></p>
+
+  <div class="fig">
+    <svg viewBox="0 0 700 170" width="100%">
+      <g>
+        <rect x="14" y="30" width="150" height="96" rx="10" fill="#EAF3DC" stroke="#7CB342"/>
+        <text x="89" y="52" font-size="10.5" font-weight="800" fill="#3F6212" text-anchor="middle">00:00 · Normal</text>
+        <text x="89" y="70" font-size="8.8" fill="#4A5A74" text-anchor="middle">MPLS carries bulk traffic;</text>
+        <text x="89" y="83" font-size="8.8" fill="#4A5A74" text-anchor="middle">Starlink carries voice/ERP</text>
+        <text x="89" y="96" font-size="8.8" fill="#4A5A74" text-anchor="middle">priority. Both paths healthy.</text>
+        <text x="89" y="114" font-size="8.4" font-weight="700" fill="#689F38" text-anchor="middle">ALL SYSTEMS LIVE</text>
+      </g>
+      <path d="M168 78 L196 78" stroke="#94A7C4" stroke-width="1.6" marker-end="url(#ar)"/>
+      <g>
+        <rect x="200" y="30" width="150" height="96" rx="10" fill="#FCF0DC" stroke="#E8A33D"/>
+        <text x="275" y="52" font-size="10.5" font-weight="800" fill="#9A6414" text-anchor="middle">00:0X · Degradation</text>
+        <text x="275" y="70" font-size="8.8" fill="#4A5A74" text-anchor="middle">MPLS packet loss rises.</text>
+        <text x="275" y="83" font-size="8.8" fill="#4A5A74" text-anchor="middle">Controller detects within</text>
+        <text x="275" y="96" font-size="8.8" fill="#4A5A74" text-anchor="middle">seconds — before users feel it.</text>
+        <text x="275" y="114" font-size="8.4" font-weight="700" fill="#9A6414" text-anchor="middle">AUTOMATIC ACTION BEGINS</text>
+      </g>
+      <path d="M354 78 L382 78" stroke="#94A7C4" stroke-width="1.6" marker-end="url(#ar)"/>
+      <g>
+        <rect x="386" y="30" width="150" height="96" rx="10" fill="#DCEBFB" stroke="#1473E8"/>
+        <text x="461" y="52" font-size="10.5" font-weight="800" fill="#0B4EA2" text-anchor="middle">+ seconds · Failover</text>
+        <text x="461" y="70" font-size="8.8" fill="#4A5A74" text-anchor="middle">All traffic shifts to the</text>
+        <text x="461" y="83" font-size="8.8" fill="#4A5A74" text-anchor="middle">Starlink path. Sessions stay</text>
+        <text x="461" y="96" font-size="8.8" fill="#4A5A74" text-anchor="middle">up. Staff notice nothing.</text>
+        <text x="461" y="114" font-size="8.4" font-weight="700" fill="#0B4EA2" text-anchor="middle">NO HUMAN IN THE LOOP</text>
+      </g>
+      <path d="M540 78 L568 78" stroke="#94A7C4" stroke-width="1.6" marker-end="url(#ar)"/>
+      <g>
+        <rect x="572" y="30" width="114" height="96" rx="10" fill="#061A33"/>
+        <text x="629" y="52" font-size="10.5" font-weight="800" fill="#7CB342" text-anchor="middle">Next morning</text>
+        <text x="629" y="70" font-size="8.8" fill="#B9C9E2" text-anchor="middle">Easynet NOC report</text>
+        <text x="629" y="83" font-size="8.8" fill="#B9C9E2" text-anchor="middle">in your inbox; telco</text>
+        <text x="629" y="96" font-size="8.8" fill="#B9C9E2" text-anchor="middle">fault chased by us.</text>
+        <text x="629" y="114" font-size="7.6" font-weight="700" fill="#fff" text-anchor="middle">2AM CALL IS OPTIONAL</text>
+      </g>
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#94A7C4"/></marker></defs>
+    </svg>
+    <div class="figcap"><span class="tag">FIG 3</span> A real outage becomes a footnote in a morning report, not an emergency.</div>
+  </div>
+
+  <table style="margin-top:5mm">
+    <tr><th style="width:34%">During a circuit outage…</th><th style="width:33%">Traditional single-path MPLS</th><th>Easynet SD-WAN over Starlink</th></tr>
+    <tr><td><b>Who notices first?</b></td><td>Your staff and customers</td><td class="t-yes">The network — seconds before users feel it</td></tr>
+    <tr><td><b>Time to restore service</b></td><td>Hours (a phone call, a telco ticket, a truck roll)</td><td class="t-yes">Seconds, automatically</td></tr>
+    <tr><td><b>Critical apps (ERP, cards, voice)</b></td><td class="t-no">Down until fixed</td><td class="t-yes">Stay up — duplicated across both paths</td></tr>
+    <tr><td><b>What management sees</b></td><td>Complaints and guesswork</td><td class="t-yes">A timestamped incident report with cause and resolution</td></tr>
+    <tr><td><b>Cost while down</b></td><td class="t-no">Lost sales, idle staff, manual workarounds</td><td class="t-yes">Business continues normally</td></tr>
+  </table>
+  <div class="cfoot"><span><span class="b">EASYNET IT SOLUTIONS LIMITED</span> · Commercial in confidence</span><span>Page 5 of 13</span></div>
+</div></section>
+
+<!-- ============ PAGE 6 · COMPARISON ============ -->
+<section class="page"><div class="pad">
+  <div class="chead"><span class="mark"><img src="@@LOGO@@" alt="Easynet"></span>
+    <div class="doc"><b>EN-PRP-2026-014</b><br>Secure multi-site connectivity · SD-WAN over Starlink</div></div>
+  <span class="eyebrow">04 · Side-by-side</span>
+  <h2 class="st">Traditional MPLS vs Easynet SD-WAN over Starlink</h2>
+  <div class="rule"></div>
+  <table>
+    <tr><th style="width:26%">What matters to management</th><th style="width:35%">Traditional telco MPLS</th><th style="width:39%">Easynet SD-WAN over Starlink</th></tr>
+    <tr><td><b>Coverage</b></td><td>Only where the telco has built — cities and major towns</td><td class="t-yes">Anywhere in PNG with a view of the sky, including islands and mine sites</td></tr>
+    <tr><td><b>Time to connect a new site</b></td><td class="t-no">Weeks to months (circuit ordering, civil works)</td><td class="t-yes">Days — dish, edge appliance, commissioning in one site visit</td></tr>
+    <tr><td><b>Typical bandwidth per site</b></td><td>2–10 Mbps leased, shared on the backhaul</td><td class="t-yes">Substantially higher, scalable with service plan (indicative, subject to survey)</td></tr>
+    <tr><td><b>Monthly cost per site</b></td><td class="t-no">Premium leased-line pricing, long contracts</td><td class="t-yes">Commodity internet pricing + modest managed fee</td></tr>
+    <tr><td><b>Encryption &amp; privacy</b></td><td class="t-part">Often relies on the telco's private backbone; not always encrypted</td><td class="t-yes">End-to-end encrypted tunnels as standard, every site</td></tr>
+    <tr><td><b>Application priority (QoS)</b></td><td class="t-part">CoS classes at extra cost, coarse control</td><td class="t-yes">Per-application steering — ERP and voice first, backups last</td></tr>
+    <tr><td><b>Automatic failover</b></td><td class="t-no">Rarely included; manual reconfiguration typical</td><td class="t-yes">Built in — seconds, no human in the loop</td></tr>
+    <tr><td><b>Visibility &amp; reporting</b></td><td class="t-no">Telco ticket queue; limited transparency</td><td class="t-yes">Live dashboard + monthly management report from Easynet NOC</td></tr>
+    <tr><td><b>Scaling to more sites</b></td><td class="t-no">Each site = new order, new lead time, new contract</td><td class="t-yes">Add a site with a kit and a configuration push</td></tr>
+    <tr><td><b>What happens to existing circuits?</b></td><td>—</td><td class="t-yes">Kept as a managed backup path — complement, not replace</td></tr>
+    <tr><td><b>Single accountable partner</b></td><td class="t-no">Telco for circuits, integrator for routers, nobody for the outcome</td><td class="t-yes">Easynet — one contract, one team, one number to call</td></tr>
+  </table>
+  <p style="font-size:9.5px;margin-top:4mm;color:var(--slate-500)">Comparison is indicative of typical PNG deployments and will be confirmed for your sites during the design survey. Where your existing MPLS
+     performs well and is priced fairly, we recommend keeping it as one of the managed paths.</p>
+  <div class="cfoot"><span><span class="b">EASYNET IT SOLUTIONS LIMITED</span> · Commercial in confidence</span><span>Page 6 of 13</span></div>
+</div></section>
+
+<!-- ============ PAGE 7 · ARCHITECTURE ============ -->
+<section class="page"><div class="pad">
+  <div class="chead"><span class="mark"><img src="@@LOGO@@" alt="Easynet"></span>
+    <div class="doc"><b>EN-PRP-2026-014</b><br>Secure multi-site connectivity · SD-WAN over Starlink</div></div>
+  <span class="eyebrow">05 · Reference architecture</span>
+  <h2 class="st">What we install, where — in one picture</h2>
+  <div class="rule"></div>
+
+  <div class="fig">
+    <svg viewBox="0 0 700 330" width="100%">
+      <text x="18" y="20" font-size="10" font-weight="800" fill="#0B4EA2" letter-spacing="1">BRANCH SITE (EACH LOCATION)</text>
+      <rect x="14" y="28" width="320" height="120" rx="10" fill="#F5F8FC" stroke="#E3EAF4"/>
+      <g font-size="8.8" fill="#4A5A74">
+        <rect x="28" y="42" width="86" height="34" rx="6" fill="#fff" stroke="#C9D6E8"/><text x="71" y="57" text-anchor="middle" font-weight="700" fill="#0B1B33">POS / ERP</text><text x="71" y="69" text-anchor="middle">card &amp; sales</text>
+        <rect x="124" y="42" width="86" height="34" rx="6" fill="#fff" stroke="#C9D6E8"/><text x="167" y="57" text-anchor="middle" font-weight="700" fill="#0B1B33">PC &amp; phones</text><text x="167" y="69" text-anchor="middle">staff tools</text>
+        <rect x="220" y="42" width="100" height="34" rx="6" fill="#fff" stroke="#C9D6E8"/><text x="270" y="57" text-anchor="middle" font-weight="700" fill="#0B1B33">Wi-Fi &amp; CCTV</text><text x="270" y="69" text-anchor="middle">guest + security</text>
+      </g>
+      <path d="M71 76 V96 M167 76 V96 M270 76 V96" stroke="#94A7C4" stroke-width="1.2"/>
+      <path d="M40 96 H300" stroke="#94A7C4" stroke-width="1.2"/>
+      <text x="308" y="92" font-size="8" fill="#64748B">LAN</text>
+      <rect x="94" y="100" width="160" height="38" rx="8" fill="#0658C9"/>
+      <text x="174" y="116" font-size="9.6" font-weight="800" fill="#fff" text-anchor="middle">EASYNET SD-WAN EDGE</text>
+      <text x="174" y="129" font-size="8" fill="#DCEBFB" text-anchor="middle">firewall · encryption · steering</text>
+      <path d="M174 138 V148" stroke="#94A7C4" stroke-width="1.2"/>
+      <rect x="60" y="150" width="110" height="30" rx="6" fill="#fff" stroke="#1473E8" stroke-width="1.4"/><text x="115" y="169" font-size="9" font-weight="700" fill="#0B4EA2" text-anchor="middle">Starlink dish</text>
+      <rect x="184" y="150" width="126" height="30" rx="6" fill="#fff" stroke="#C9D6E8"/><text x="247" y="169" font-size="9" font-weight="600" fill="#64748B" text-anchor="middle">MPLS / 4G (backup)</text>
+
+      <g stroke="#1473E8" stroke-width="2" fill="none"><path d="M115 180 V214"/><path d="M247 180 V214" stroke-dasharray="5 4" stroke="#94A7C4" stroke-width="1.4"/><path d="M457 208 V214"/></g>
+      <rect x="40" y="214" width="620" height="34" rx="8" fill="#EAF3DC" stroke="#7CB342"/>
+      <text x="350" y="235" font-size="9.4" font-weight="800" fill="#3F6212" text-anchor="middle">PRIVATE ENCRYPTED TUNNELS — SD-WAN OVER INTERNET / SATELLITE</text>
+
+      <text x="372" y="70" font-size="10" font-weight="800" fill="#0B4EA2" letter-spacing="1">HEAD OFFICE — PORT MORESBY</text>
+      <rect x="368" y="78" width="318" height="130" rx="10" fill="#F5F8FC" stroke="#E3EAF4"/>
+      <rect x="382" y="92" width="150" height="36" rx="8" fill="#061A33"/>
+      <text x="457" y="107" font-size="9.4" font-weight="800" fill="#fff" text-anchor="middle">CORE FIREWALL + SD-WAN HUB</text>
+      <text x="457" y="120" font-size="8" fill="#9FB3D1" text-anchor="middle">terminates every branch tunnel</text>
+      <g font-size="8.8" fill="#4A5A74">
+        <rect x="546" y="92" width="126" height="36" rx="6" fill="#fff" stroke="#C9D6E8"/><text x="609" y="107" text-anchor="middle" font-weight="700" fill="#0B1B33">ERP / file servers</text><text x="609" y="119" text-anchor="middle">M365 · backups</text>
+        <rect x="382" y="140" width="140" height="34" rx="6" fill="#fff" stroke="#C9D6E8"/><text x="452" y="155" text-anchor="middle" font-weight="700" fill="#0B1B33">HO staff LAN/Wi-Fi</text><text x="452" y="166" text-anchor="middle">same private network</text>
+        <rect x="536" y="140" width="136" height="34" rx="6" fill="#fff" stroke="#7CB342"/><text x="604" y="155" text-anchor="middle" font-weight="700" fill="#3F6212">EASYNET NOC</text><text x="604" y="166" text-anchor="middle">monitoring · alerts · reports</text>
+      </g>
+      <path d="M185 248 V270 M185 270 H457 V208 M185 270 H604 V174" stroke="#7CB342" stroke-width="1.4" fill="none" stroke-dasharray="2 3"/>
+      <text x="20" y="300" font-size="9" fill="#64748B">Blue solid = satellite primary · grey dashed = retained backup · green dotted = management &amp; monitoring path from the Easynet NOC.</text>
+      <text x="20" y="316" font-size="9" fill="#64748B">Every layer is a product Easynet already supplies, installs and supports under one contract.</text>
+    </svg>
+    <div class="figcap"><span class="tag">FIG 4</span> Branch, transport, head office and monitoring — one engineered system.</div>
+  </div>
+
+  <div class="cards">
+    <div class="card"><h4>At each branch</h4><p>Starlink dish &amp; mount, SD-WAN edge firewall appliance, LAN/Wi-Fi refresh as needed, UPS for clean power, labelled cabling and documentation.</p></div>
+    <div class="card"><h4>At head office</h4><p>Core firewall and SD-WAN hub configuration, integration with your ERP/file/M365 services, and monitoring dashboards for your management.</p></div>
+    <div class="card"><h4>From our NOC</h4><p>24×7-style proactive monitoring during support hours, alerting, monthly performance &amp; availability reporting, and continuous configuration care.</p></div>
+  </div>
+  <div class="cfoot"><span><span class="b">EASYNET IT SOLUTIONS LIMITED</span> · Commercial in confidence</span><span>Page 7 of 13</span></div>
+</div></section>
+
+<!-- ============ PAGE 8 · BENEFITS ============ -->
+<section class="page"><div class="pad">
+  <div class="chead"><span class="mark"><img src="@@LOGO@@" alt="Easynet"></span>
+    <div class="doc"><b>EN-PRP-2026-014</b><br>Secure multi-site connectivity · SD-WAN over Starlink</div></div>
+  <span class="eyebrow">06 · Business benefits</span>
+  <h2 class="st">What this means for your bottom line</h2>
+  <div class="rule"></div>
+  <div class="bgrid">
+    <div class="bcard"><h4>1 · Revenue protection</h4><p>Branches keep selling through outages that previously meant closed tills, failed card machines and unrecorded stock. Uptime becomes the default, not the exception.</p></div>
+    <div class="bcard g"><h4>2 · Lower recurring cost</h4><p>Replace or downsize premium leased lines. Satellite + internet pricing with a transparent managed fee — and we keep negotiating your telco costs as part of the service.</p></div>
+    <div class="bcard"><h4>3 · Growth at business speed</h4><p>A new branch, store or site joins the private network within days of opening — live systems on day one, not month four.</p></div>
+    <div class="bcard g"><h4>4 · One network, total visibility</h4><p>Head office sees every branch's stock, sales and systems in real time. Management gets a monthly availability and performance report instead of anecdotes.</p></div>
+    <div class="bcard"><h4>5 · Bank-grade security as standard</h4><p>End-to-end encryption, enterprise firewalls and segmented traffic at every site — the posture regulators and insurers increasingly expect.</p></div>
+    <div class="bcard g"><h4>6 · Sleep-at-night resilience</h4><p>Automatic failover with no human in the loop, tested backups, and a named local partner accountable for the outcome — not a telco ticket queue.</p></div>
+  </div>
+  <div style="margin-top:6mm">
+    <span class="eyebrow">And the capacity unlocks more</span>
+    <p class="lede">With real bandwidth at every site, projects that were previously “impossible outside Port Moresby” become routine:</p>
+    <div class="cards" style="margin-top:3mm">
+      <div class="card"><h4>Cloud ERP &amp; POS everywhere</h4><p>Head-office systems, live at every branch.</p></div>
+      <div class="card"><h4>CCTV &amp; remote monitoring</h4><p>View any site's cameras from HO or your phone.</p></div>
+      <div class="card"><h4>Voice, video &amp; Teams</h4><p>Clean calls between sites and with customers.</p></div>
+      <div class="card"><h4>Automatic off-site backups</h4><p>Every site's data protected nightly, verified monthly.</p></div>
+    </div>
+  </div>
+  <div class="cfoot"><span><span class="b">EASYNET IT SOLUTIONS LIMITED</span> · Commercial in confidence</span><span>Page 8 of 13</span></div>
+</div></section>
+
+<!-- ============ PAGE 9 · IMPLEMENTATION ============ -->
+<section class="page"><div class="pad">
+  <div class="chead"><span class="mark"><img src="@@LOGO@@" alt="Easynet"></span>
+    <div class="doc"><b>EN-PRP-2026-014</b><br>Secure multi-site connectivity · SD-WAN over Starlink</div></div>
+  <span class="eyebrow">07 · Implementation plan</span>
+  <h2 class="st">From signature to live network in about four weeks</h2>
+  <div class="rule"></div>
+
+  <div class="fig">
+    <svg viewBox="0 0 700 190" width="100%">
+      <g font-size="9" fill="#64748B">
+        <text x="180" y="18">Wk 1</text><text x="300" y="18">Wk 2</text><text x="420" y="18">Wk 3</text><text x="540" y="18">Wk 4</text><text x="640" y="18">Ongoing</text>
+      </g>
+      <g stroke="#E3EAF4"><line x1="170" y1="24" x2="170" y2="180"/><line x1="290" y1="24" x2="290" y2="180"/><line x1="410" y1="24" x2="410" y2="180"/><line x1="530" y1="24" x2="530" y2="180"/><line x1="620" y1="24" x2="620" y2="180"/></g>
+      <g font-size="9.6" font-weight="700" fill="#0B1B33">
+        <text x="14" y="46">1 · Survey &amp; design</text>
+        <text x="14" y="78">2 · Supply &amp; staging</text>
+        <text x="14" y="110">3 · Install per site</text>
+        <text x="14" y="142">4 · Test &amp; handover</text>
+        <text x="14" y="174">5 · Managed support</text>
+      </g>
+      <rect x="170" y="34" width="120" height="16" rx="8" fill="#0658C9"/>
+      <rect x="230" y="66" width="180" height="16" rx="8" fill="#1473E8"/>
+      <rect x="290" y="98" width="240" height="16" rx="8" fill="#7CB342"/>
+      <rect x="470" y="130" width="120" height="16" rx="8" fill="#689F38"/>
+      <rect x="620" y="162" width="70" height="16" rx="8" fill="#061A33"/>
+      <g font-size="8.2" fill="#4A5A74">
+        <text x="175" y="60">site visits, bandwidth study, design pack &amp; fixed quote</text>
+        <text x="235" y="92">kits procured, hub configured &amp; staged in Port Moresby</text>
+        <text x="295" y="124">2–3 days on site each: dish, edge, LAN, UPS, commissioning</text>
+        <text x="475" y="156">failover drills, QoS tuning, staff briefing, documentation</text>
+        <text x="624" y="186" fill="#061A33">monitoring &amp; care</text>
+      </g>
+    </svg>
+    <div class="figcap"><span class="tag">FIG 5</span> Indicative programme for a head office plus up to four branches; each additional site adds 2–3 site-days.</div>
+  </div>
+
+  <div class="cards" style="margin-top:5mm">
+    <div class="card"><h4>No disruption to trading</h4><p>Installations are scheduled around your operations; the cutover to the new network is performed live with instant rollback to the old path.</p></div>
+    <div class="card"><h4>Fixed-price phases</h4><p>After the survey you receive one fixed written quotation in kina. No open-ended time-and-materials.</p></div>
+    <div class="card"><h4>Documented handover</h4><p>You receive as-built diagrams, credentials in your name, an executive summary for management, and a staff quick-guide at each site.</p></div>
+  </div>
+
+  <div style="margin-top:5mm">
+    <span class="eyebrow">What we need from you</span>
+    <ol class="nice">
+      <li><b>A list of sites</b> to connect (addresses or GPS) and roughly what each site runs (POS, ERP, cameras, phone).</li>
+      <li><b>Current circuit invoices</b> (MPLS/4G) for the last 2–3 months — we benchmark your saving honestly.</li>
+      <li><b>One point of contact</b> for scheduling site access; our coordinator handles everything else.</li>
+    </ol>
+  </div>
+  <div class="cfoot"><span><span class="b">EASYNET IT SOLUTIONS LIMITED</span> · Commercial in confidence</span><span>Page 9 of 13</span></div>
+</div></section>
+
+<!-- ============ PAGE 10 · INVESTMENT ============ -->
+<section class="page"><div class="pad">
+  <div class="chead"><span class="mark"><img src="@@LOGO@@" alt="Easynet"></span>
+    <div class="doc"><b>EN-PRP-2026-014</b><br>Secure multi-site connectivity · SD-WAN over Starlink</div></div>
+  <span class="eyebrow">08 · Investment</span>
+  <h2 class="st">Commercial model — simple, transparent, in kina</h2>
+  <div class="rule"></div>
+  <p class="lede">Pricing is confirmed as a <strong>fixed written quotation</strong> after the free design survey. The structure below shows
+     exactly what you will pay for — one-time build costs, a predictable monthly service fee, and pass-through subscriptions
+     with no markup games.</p>
+  <table style="margin-top:4mm">
+    <tr><th style="width:46%">Component</th><th style="width:17%">Type</th><th style="width:37%">Indicative basis</th></tr>
+    <tr><td><b>Design survey &amp; network blueprint</b> (all sites, incl. bandwidth study and savings benchmark)</td><td>One-time</td><td class="t-yes">Included — credited against the project</td></tr>
+    <tr><td><b>Branch site kit</b> — Starlink hardware, SD-WAN edge firewall, mount &amp; cabling, UPS, Wi-Fi refresh as needed</td><td>One-time / site</td><td>K ______ (fixed after survey)</td></tr>
+    <tr><td><b>Head-office hub</b> — core firewall, SD-WAN controller, integration with ERP / files / M365</td><td>One-time</td><td>K ______ (fixed after survey)</td></tr>
+    <tr><td><b>Managed SD-WAN service</b> — monitoring, failover care, QoS tuning, monthly management report, helpdesk</td><td>Monthly / site</td><td>K ______ / month</td></tr>
+    <tr><td><b>Starlink subscription</b></td><td>Monthly / site</td><td>Pass-through at provider rate, billed direct or on-charged at cost</td></tr>
+    <tr><td><b>Optional extras</b> — 4G backup modem, CCTV integration, additional Wi-Fi coverage, on-site support visits</td><td>As chosen</td><td>Quoted per item</td></tr>
+  </table>
+  <p style="font-size:10px;margin-top:4mm"><strong>Where the saving shows up:</strong> most clients either cancel premium leased lines at remote sites
+     entirely, or downgrade them to backup-only. The survey report quantifies both your current spend and the projected spend, line by line,
+     so the payback is visible before you commit.</p>
+
+  <div class="cards" style="margin-top:5mm">
+    <div class="card"><h4>Pilot-first option</h4><p>Start with head office plus one pilot branch for 60 days. See the dashboards, the failover drills and the report — then roll out site by site.</p></div>
+    <div class="card"><h4>No surprise pricing</h4><p>Fixed quotation in kina, valid 30 days. Any work discovered mid-project that wasn't scoped is quoted and approved before it happens.</p></div>
+    <div class="card"><h4>Assets in your name</h4><p>Hardware and subscriptions are registered to your company. If we ever part ways, the network is yours — that's how trust should work.</p></div>
+  </div>
+  <div class="cfoot"><span><span class="b">EASYNET IT SOLUTIONS LIMITED</span> · Commercial in confidence</span><span>Page 10 of 13</span></div>
+</div></section>
+
+<!-- ============ PAGE 11 · WHY EASYNET + SLA ============ -->
+<section class="page"><div class="pad">
+  <div class="chead"><span class="mark"><img src="@@LOGO@@" alt="Easynet"></span>
+    <div class="doc"><b>EN-PRP-2026-014</b><br>Secure multi-site connectivity · SD-WAN over Starlink</div></div>
+  <span class="eyebrow">09 · Why Easynet</span>
+  <h2 class="st">A local partner who stays after the dish goes up</h2>
+  <div class="rule"></div>
+  <p class="lede">Engineering a network is one skill; <strong>sustaining</strong> it in PNG conditions is another. Easynet is a
+     <strong>100% Papua New Guinea-owned</strong> company with a field project team that travels, a Port Moresby operations
+     base, and a business model built on monthly support contracts — our incentive is that your network <em>stays</em> up.</p>
+  <div class="cards" style="margin-top:4mm">
+    <div class="card"><h4>One contract, one team</h4><p>Satellite, network, firewall, backup, support — under a single accountable agreement. No vendor ping-pong.</p></div>
+    <div class="card"><h4>Field team across PNG</h4><p>On-site delivery in Lae, Mount Hagen, Goroka, Madang, Kokopo, Wewak, Alotau, Popondetta and beyond.</p></div>
+    <div class="card"><h4>Security &amp; backups built in</h4><p>Firewalls, endpoint protection and tested off-site backups come standard with our infrastructure work.</p></div>
+    <div class="card"><h4>Ongoing, not one-off</h4><p>Monthly monitoring, maintenance and reporting — the “day 400” problem is our job description.</p></div>
+  </div>
+
+  <div style="margin-top:6mm">
+    <span class="eyebrow">Proposed service commitment</span>
+    <table>
+      <tr><th style="width:34%">Priority</th><th style="width:33%">What it means</th><th>Response target (business hours + monitored)</th></tr>
+      <tr><td><b>P1 — site or network down</b></td><td>All branches or HO unable to transact</td><td class="t-yes">60 minutes to engineer engaged</td></tr>
+      <tr><td><b>P2 — degraded service</b></td><td>Slow or partial functionality on one path</td><td class="t-yes">4 business hours</td></tr>
+      <tr><td><b>P3 — routine request</b></td><td>Changes, additions, reports, questions</td><td class="t-yes">Next business day</td></tr>
+    </table>
+    <p style="font-size:9.5px;color:var(--slate-500);margin-top:2.5mm">Final service levels, support hours and escalation contacts are set in the managed-services agreement. Monitoring runs continuously;
+       human response follows the table above.</p>
+  </div>
+  <div class="cfoot"><span><span class="b">EASYNET IT SOLUTIONS LIMITED</span> · Commercial in confidence</span><span>Page 11 of 13</span></div>
+</div></section>
+
+<!-- ============ PAGE 12 · ASSUMPTIONS / NEXT / SIGN ============ -->
+<section class="page"><div class="pad">
+  <div class="chead"><span class="mark"><img src="@@LOGO@@" alt="Easynet"></span>
+    <div class="doc"><b>EN-PRP-2026-014</b><br>Secure multi-site connectivity · SD-WAN over Starlink</div></div>
+  <span class="eyebrow">10 · Assumptions &amp; next steps</span>
+  <h2 class="st">Clear assumptions, simple next steps</h2>
+  <div class="rule"></div>
+  <div style="display:flex;gap:6mm">
+    <div style="flex:1.15">
+      <p style="font-weight:700;color:var(--ink-900);margin-bottom:2mm">Assumptions</p>
+      <ol class="nice">
+        <li>Each site has (or will be given) a clear view of the sky and reasonable power; sites without reliable power are quoted with solar/UPS options.</li>
+        <li>Starlink service availability and subscription rates follow the provider's current PNG offering at time of order.</li>
+        <li>Existing MPLS/4G circuits, where retained, remain under your current telco contracts; Easynet manages them as paths within the SD-WAN.</li>
+        <li>Performance figures are confirmed per site by the design survey before any commitment.</li>
+        <li>Site access for survey and installation is arranged during normal operating hours unless otherwise agreed.</li>
+      </ol>
+      <p style="font-weight:700;color:var(--ink-900);margin:5mm 0 2mm">Next steps</p>
+      <ol class="nice">
+        <li><b>This week —</b> a 30-minute call with your management team to confirm sites and priorities.</li>
+        <li><b>Next —</b> free design survey and a fixed written quotation with a line-by-line savings benchmark.</li>
+        <li><b>Then —</b> pilot site live within ~two weeks of approval; roll-out scheduled at your pace.</li>
+      </ol>
+    </div>
+    <div style="flex:1">
+      <p style="font-weight:700;color:var(--ink-900);margin-bottom:2mm">Acceptance</p>
+      <div class="sig" style="margin-top:0;flex-direction:column;gap:4mm">
+        <div class="box"><h4>Prepared by — Easynet IT Solutions Ltd</h4>
+          <div class="line"></div><div class="lbl">Name / title · Arka C, Chief Technology Officer</div>
+          <div class="line" style="margin-top:4mm"></div><div class="lbl">Date</div></div>
+        <div class="box"><h4>Accepted by — [Client company]</h4>
+          <div class="line"></div><div class="lbl">Name / title</div>
+          <div class="line" style="margin-top:4mm"></div><div class="lbl">Date · signature authorises the design survey only</div></div>
+      </div>
+      <div style="margin-top:5mm;background:var(--navy-900);border-radius:4mm;padding:4.5mm 5mm;color:#B9C9E2;font-size:10px;line-height:1.7">
+        <b style="color:#fff">Talk to us</b><br>
+        +675 72743186 · hello.easynet@hotmail.com<br>
+        8 Mile, Gran Eden, Lot 110, Section 147, Port Moresby<br>
+        Mon–Fri 8:30–17:00 · easynetpng.com
+      </div>
+    </div>
+  </div>
+  <div class="cfoot"><span><span class="b">EASYNET IT SOLUTIONS LIMITED</span> · Commercial in confidence</span><span>Page 12 of 13</span></div>
+</div></section>
+
+<!-- ============ PAGE 13 · GLOSSARY ============ -->
+<section class="page"><div class="pad">
+  <div class="chead"><span class="mark"><img src="@@LOGO@@" alt="Easynet"></span>
+    <div class="doc"><b>EN-PRP-2026-014</b><br>Secure multi-site connectivity · SD-WAN over Starlink</div></div>
+  <span class="eyebrow">Appendix</span>
+  <h2 class="st">Plain-English glossary</h2>
+  <div class="rule"></div>
+  <table>
+    <tr><th style="width:24%">Term</th><th style="width:76%">What it means, without the jargon</th></tr>
+    <tr><td><b>SD-WAN</b></td><td>Software that turns any internet connection into a smart, private corporate network link — choosing the best path for every application, automatically.</td></tr>
+    <tr><td><b>MPLS</b></td><td>The traditional private circuit product sold by telcos for ~20 years. Reliable where it exists, but expensive, small and slow to order in PNG.</td></tr>
+    <tr><td><b>Starlink (LEO)</b></td><td>Internet from a constellation of low-orbit satellites. High capacity and low delay compared with old satellite internet; available almost anywhere.</td></tr>
+    <tr><td><b>Hub &amp; spoke</b></td><td>The shape of your network: head office is the hub; every branch is a spoke with its own secure link home.</td></tr>
+    <tr><td><b>Encrypted tunnel</b></td><td>Your data is sealed in a private envelope before it touches any public network, and unsealed only at your end. Nobody in between can read it.</td></tr>
+    <tr><td><b>Application steering / QoS</b></td><td>The network's traffic controller: your ERP and phone calls jump the queue; YouTube and big downloads wait their turn.</td></tr>
+    <tr><td><b>Failover</b></td><td>The automatic switch to a backup path when the main path misbehaves. In this design it happens in seconds, with nobody touching anything.</td></tr>
+    <tr><td><b>Latency &amp; packet loss</b></td><td>Delay and dropped data — the two invisible causes of “the system is slow”. SD-WAN measures both constantly and routes around trouble.</td></tr>
+    <tr><td><b>NOC</b></td><td>Network Operations Centre — Easynet's monitoring desk in Port Moresby that watches every site and reports to you monthly.</td></tr>
+    <tr><td><b>Edge appliance</b></td><td>The small hardened box we install at each site — firewall, encryption and steering in one unit, pre-configured before it arrives.</td></tr>
+  </table>
+  <p style="font-size:10px;margin-top:6mm;color:var(--slate-600)"><strong>Our promise in one sentence:</strong> we design it, build it, secure it, monitor it and answer the phone when you call —
+     one PNG company, accountable for your whole network.</p>
+  <div class="cfoot"><span><span class="b">EASYNET IT SOLUTIONS LIMITED</span> · Commercial in confidence</span><span>Page 13 of 13</span></div>
+</div></section>
+
+</body>
+</html>
