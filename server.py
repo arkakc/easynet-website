@@ -141,7 +141,7 @@ def save_enquiry(data):
 def build_email(seq, data):
     msg = EmailMessage()
     msg["Subject"] = "WEB Enquiry Sequence No. %s" % seq
-    msg["From"] = SMTP_USER or "website@easynetsolutions.com.pg"
+    msg["From"] = SMTP_USER or "website@easynetpng.com"
     msg["To"] = CONTACT_TO
     msg["Date"] = formatdate(localtime=True)
     if data.get("email"):

@@ -1,8 +1,8 @@
 Contact: mailto:hello.easynet@hotmail.com
 Preferred-Languages: en
 Expires: 2027-08-29T00:00:00.000Z
-Canonical: https://easynetsolutions.com.pg/.well-known/security.txt
-Encryption: https://easynetsolutions.com.pg/security.txt
+Canonical: https://easynetpng.com/.well-known/security.txt
+Encryption: https://easynetpng.com/security.txt
 Policy: We take the security of our website and our customers' data seriously.
         If you discover a security vulnerability, please report it to us by email
         and we will acknowledge your report within 2 business days. We ask that you

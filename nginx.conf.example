@@ -11,7 +11,7 @@
 
 server {
     listen 80;
-    server_name easynetsolutions.com.pg www.easynetsolutions.com.pg;
+    server_name easynetpng.com www.easynetpng.com;
 
     # redirect all traffic to HTTPS
     return 301 https://$host$request_uri;
@@ -19,10 +19,10 @@ server {
 
 server {
     listen 443 ssl http2;
-    server_name easynetsolutions.com.pg www.easynetsolutions.com.pg;
+    server_name easynetpng.com www.easynetpng.com;
 
-    ssl_certificate     /etc/letsencrypt/live/easynetsolutions.com.pg/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/easynetsolutions.com.pg/privkey.pem;
+    ssl_certificate     /etc/letsencrypt/live/easynetpng.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/easynetpng.com/privkey.pem;
     ssl_protocols       TLSv1.2 TLSv1.3;
     ssl_ciphers         HIGH:!aNULL:!MD5;
 

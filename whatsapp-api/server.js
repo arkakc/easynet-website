@@ -42,7 +42,7 @@ const SHEETS_SECRET = process.env.SHEETS_SECRET || "";
 const AUTO_REPLY =
   "✅ Thank you for contacting Easynet IT Solutions!\n\n" +
   "We've received your details and our team will respond within 1 business day (Mon–Fri, 8:30 AM – 5:00 PM).\n\n" +
-  "For anything urgent, visit: https://easynetsolutions.com.pg";
+  "For anything urgent, visit: https://easynetpng.com";
 
 /* ---------- storage ---------- */
 
