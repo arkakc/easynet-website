@@ -1,0 +1,92 @@
+# Easynet IT Solutions Limited
+
+> Easynet IT Solutions Limited is a 100% Papua New Guinea-owned IT consulting, sales and
+> services company based in Port Moresby. It provides web design and website development,
+> digital marketing, ERP and business automation, ICT infrastructure, networking, firewall
+> and cybersecurity, server and cloud, backup, hardware supply and managed IT support to
+> businesses across Papua New Guinea.
+
+This file summarises the company and website for AI assistants, search engines and
+automated agents. All facts below are also published as schema.org JSON-LD on the site.
+
+## Company facts
+
+- Legal name: Easynet IT Solutions Limited
+- Ownership: 100% Papua New Guinea-owned
+- Headquarters: 8 Mile, Gran Eden, Lot 110, Section 147, Port Moresby, National Capital District, Papua New Guinea
+- Service area: Port Moresby and all of Papua New Guinea (on-site work via a local field project team; remote support and monitoring nationwide)
+- Phone / WhatsApp: +675 72743186
+- Email: hello.easynet@hotmail.com
+- Business hours: Monday to Friday, 8:30 AM – 5:00 PM (Port Moresby time)
+- Website: https://easynetsolutions.com.pg/
+
+## Services
+
+Two delivery divisions cover eleven core services.
+
+### Software & Digital Solutions
+- Website Development — business websites designed and built in Port Moresby
+- Digital Marketing & Leads — social media, advertising, lead management and tracking
+- WhatsApp Automation — WhatsApp Business / WhatsApp API integration, auto-replies, lead capture
+- ERP & Business Automation — ERPNext / Zoho implementation: accounting, sales, purchasing, inventory, CRM, POS, HR
+- Custom Applications — bespoke software for specific operational needs
+
+### ICT Infrastructure & Managed Services
+- Network Solutions — LAN, Wi-Fi and office network design and installation
+- Firewall & Cybersecurity — Fortinet, OPNsense, CrowdStrike; security hardening
+- Server & Cloud — AWS, VMware, Synology, Microsoft 365
+- Backup Solutions — business backup and off-site storage (Backblaze B2)
+- Hardware Supply — computers, networking and office IT hardware
+- IT Support — remote and on-site support; managed IT contracts
+
+## Business packages
+
+- Business Starter — business website, business email, social media setup, online presence launch
+- Digital Growth — Starter plus advertising, lead management & tracking, WhatsApp automation
+- Business Automation — Digital Growth plus CRM, sales, purchasing, inventory, accounting, workflow automation
+- IT Office Setup — computers, network, Wi-Fi, firewall, CCTV, backup, Microsoft 365, business software suite
+- Managed IT — monthly remote support, monitoring, maintenance, security and backup monitoring
+
+Every service can also be purchased individually without a package.
+
+## Industries served
+
+Small and medium businesses, retail, professional services, construction, hotels,
+schools, NGOs and corporate offices.
+
+## Technology partners and platforms
+
+ERPNext, Microsoft 365, Zoho, Cloudflare, Backblaze B2, Starlink, AWS, Fortinet,
+OPNsense, Synology, Linux, VMware, Tailscale, CrowdStrike, React, Next.js, Vercel,
+GitHub, Docker, PostgreSQL.
+
+For advanced specialist work (ERPNext implementation, complex architecture, cloud or
+cybersecurity design) Easynet engages 8N8 Systems as a consulting partner under a formal
+agreement. Easynet remains the single accountable partner for the customer.
+
+## Team
+
+- Willie Batia — Director (business management, sales, customer relationships, finance, project coordination)
+- Arka C — Chief Technology Officer (technical strategy, solution design, architecture, ERP/automation)
+- Max Giamungi — IT Field Project Coordinator (on-site ICT projects, scheduling, customer liaison)
+
+## How engagement works
+
+1. Free initial discussion
+2. Recommendation of a solution
+3. Written proposal and quotation
+4. Implementation
+5. Ongoing support
+
+## Pages
+
+- [Home](https://easynetsolutions.com.pg/): full service catalogue, packages, process, industries, partners and FAQ
+- [About Us](https://easynetsolutions.com.pg/about.html): company background, vision, mission, expertise, delivery model and team
+- [Contact Us](https://easynetsolutions.com.pg/contact.html): enquiry form, phone, WhatsApp, email and address
+
+## Machine-readable data
+
+- Structured data: schema.org JSON-LD (ProfessionalService, LocalBusiness, WebSite, WebPage,
+  FAQPage, AboutPage, ContactPage, BreadcrumbList, OfferCatalog) embedded in every page
+- Sitemap: https://easynetsolutions.com.pg/sitemap.xml
+- Robots: https://easynetsolutions.com.pg/robots.txt (AI crawlers are explicitly permitted)

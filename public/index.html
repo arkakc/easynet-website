@@ -2,14 +2,20 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; Referrer-Policy: strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#061A33">
 <title>IT Company in Papua New Guinea | Web Design, ERP &amp; IT Support Port Moresby — Easynet</title>
 <meta name="description" content="Easynet IT Solutions is a 100% PNG-owned IT company in Papua New Guinea. Web design & website development in Port Moresby, digital marketing, ERP & business automation, CCTV & network installation, Starlink setup, cybersecurity and managed IT services across PNG.">
 <meta name="keywords" content="IT company in Papua New Guinea, IT services Port Moresby, IT solutions Port Moresby, IT support Port Moresby, IT company PNG, web design Port Moresby, website development Papua New Guinea, web developer PNG, software company Port Moresby, ERP software Papua New Guinea, ERP implementation PNG, business automation PNG, digital marketing Port Moresby, CCTV installation Port Moresby, network installation Port Moresby, LAN setup PNG, firewall installation PNG, Starlink installation Papua New Guinea, Starlink Port Moresby, Microsoft 365 PNG, managed IT services PNG, server room setup Port Moresby, POS system PNG, computer maintenance Port Moresby, best IT company Port Moresby, IT consultancy Papua New Guinea">
-<link rel="icon" type="image/png" href="assets/images/logo.png">
-<link rel="apple-touch-icon" href="assets/images/logo.png">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<link rel="alternate" hreflang="en-pg" href="https://easynetsolutions.com.pg/">
+<link rel="alternate" hreflang="x-default" href="https://easynetsolutions.com.pg/">
+<link rel="icon" href="assets/images/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/images/android-chrome-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
 <link rel="canonical" href="https://easynetsolutions.com.pg/">
 <!-- Open Graph -->
 <meta property="og:type" content="website">
@@ -33,12 +39,121 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "LocalBusiness",
-  "name": "Easynet IT Solutions Limited",
-  "description": "100% PNG-owned IT consulting, sales and services company delivering software, infrastructure, cybersecurity and managed IT services.",
-  "url": "https://easynetsolutions.com.pg/",
-  "address": { "@type": "PostalAddress", "addressLocality": "Port Moresby", "addressCountry": "PG" },
-  "telephone": "+675 72743186"
+  "@graph": [
+    {
+      "@type": ["ProfessionalService", "LocalBusiness"],
+      "@id": "https://easynetsolutions.com.pg/#business",
+      "name": "Easynet IT Solutions Limited",
+      "legalName": "Easynet IT Solutions Limited",
+      "alternateName": ["Easynet", "Easynet IT Solutions"],
+      "description": "Easynet IT Solutions Limited is a 100% Papua New Guinea-owned IT consulting, sales and services company in Port Moresby. It delivers web design and website development, digital marketing, ERP and business automation, ICT infrastructure, networking, firewall and cybersecurity, server and cloud, backup, hardware supply, and managed IT support to businesses across Papua New Guinea.",
+      "slogan": "Technology Solutions for Growing Businesses",
+      "url": "https://easynetsolutions.com.pg/",
+      "logo": "https://easynetsolutions.com.pg/assets/images/logo.png",
+      "image": "https://easynetsolutions.com.pg/assets/images/og-image.png",
+      "telephone": "+675 72743186",
+      "email": "hello.easynet@hotmail.com",
+      "foundingLocation": { "@type": "Place", "name": "Port Moresby, Papua New Guinea" },
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "8 Mile, Gran Eden, Lot 110, Section 147",
+        "addressLocality": "Port Moresby",
+        "addressRegion": "National Capital District",
+        "addressCountry": "PG"
+      },
+      "areaServed": [
+        { "@type": "City", "name": "Port Moresby" },
+        { "@type": "Country", "name": "Papua New Guinea" }
+      ],
+      "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        "opens": "08:30",
+        "closes": "17:00"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "sales",
+        "telephone": "+675 72743186",
+        "email": "hello.easynet@hotmail.com",
+        "availableLanguage": ["en"]
+      },
+      "employee": [
+        { "@type": "Person", "name": "Willie Batia", "jobTitle": "Director" },
+        { "@type": "Person", "name": "Arka C", "jobTitle": "Chief Technology Officer" },
+        { "@type": "Person", "name": "Max Giamungi", "jobTitle": "IT Field Project Coordinator" }
+      ],
+      "knowsAbout": [
+        "Web design and website development", "Digital marketing and lead generation",
+        "WhatsApp Business automation", "ERP and business automation", "Custom application development",
+        "Network installation and LAN setup", "Firewall and cybersecurity", "Server and cloud infrastructure",
+        "Backup solutions", "IT hardware supply", "Managed IT support", "CCTV installation",
+        "Starlink installation", "Microsoft 365 deployment"
+      ],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "IT Services and Business Packages",
+        "itemListElement": [
+          {
+            "@type": "OfferCatalog",
+            "name": "Software & Digital Solutions",
+            "itemListElement": [
+              { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Website Development", "description": "Business websites designed and built in Port Moresby for PNG businesses." } },
+              { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Digital Marketing & Leads", "description": "Social media, advertising and lead management that turn an online presence into enquiries." } },
+              { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "WhatsApp Automation", "description": "WhatsApp Business and WhatsApp API integration with automatic replies and lead capture." } },
+              { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "ERP & Business Automation", "description": "ERP implementation (ERPNext, Zoho) covering accounting, sales, purchasing, inventory, CRM, POS and HR." } },
+              { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Custom Applications", "description": "Bespoke software built to a business's specific operational requirements." } }
+            ]
+          },
+          {
+            "@type": "OfferCatalog",
+            "name": "ICT Infrastructure & Managed Services",
+            "itemListElement": [
+              { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Network Solutions", "description": "LAN, Wi-Fi and office network design and installation." } },
+              { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Firewall & Cybersecurity", "description": "Firewall installation and security hardening using Fortinet, OPNsense and CrowdStrike." } },
+              { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Server & Cloud", "description": "Server, virtualisation and cloud setup including AWS, VMware, Synology and Microsoft 365." } },
+              { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Backup Solutions", "description": "Business backup and off-site storage, including Backblaze B2." } },
+              { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Hardware Supply", "description": "Supply of computers, networking and office IT hardware." } },
+              { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "IT Support", "description": "Ongoing remote and on-site technical support and managed IT services." } }
+            ]
+          },
+          {
+            "@type": "OfferCatalog",
+            "name": "Business Packages",
+            "itemListElement": [
+              { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Business Starter", "description": "Business website, business email, social media setup and online presence launch." } },
+              { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Digital Growth", "description": "Everything in Starter plus social media advertising, lead management and tracking, and WhatsApp automation." } },
+              { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Business Automation", "description": "Everything in Digital Growth plus CRM, sales, purchasing, inventory, accounting and workflow automation." } },
+              { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "IT Office Setup", "description": "Computers, network, Wi-Fi, firewall, CCTV, backup, Microsoft 365 and a business software suite." } },
+              { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Managed IT", "description": "Monthly remote support, monitoring, maintenance, security and backup monitoring on monthly or annual contracts." } }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://easynetsolutions.com.pg/#website",
+      "name": "Easynet IT Solutions",
+      "url": "https://easynetsolutions.com.pg/",
+      "inLanguage": "en-PG",
+      "publisher": { "@id": "https://easynetsolutions.com.pg/#business" }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://easynetsolutions.com.pg/#webpage",
+      "url": "https://easynetsolutions.com.pg/",
+      "name": "IT Company in Papua New Guinea | Web Design, ERP & IT Support Port Moresby — Easynet",
+      "isPartOf": { "@id": "https://easynetsolutions.com.pg/#website" },
+      "about": { "@id": "https://easynetsolutions.com.pg/#business" },
+      "primaryImageOfPage": { "@type": "ImageObject", "url": "https://easynetsolutions.com.pg/assets/images/og-image.png" },
+      "inLanguage": "en-PG",
+      "speakable": {
+        "@type": "SpeakableSpecification",
+        "cssSelector": [".hero h1", ".hero-sub", "#png-services p"]
+      }
+    }
+  ]
 }
 </script>
 <script type="application/ld+json">
@@ -121,7 +236,7 @@
 <header class="site-header">
   <div class="container nav-wrap">
     <a class="brand" href="index.html" aria-label="Easynet IT Solutions — Home">
-      <img src="assets/images/logo.png" alt="Easynet IT Solutions Limited logo">
+      <img src="assets/images/logo.png" alt="Easynet IT Solutions Limited logo" width="512" height="176" fetchpriority="high" decoding="async">
     </a>
     <nav class="nav-links" aria-label="Main navigation">
       <a href="index.html" class="active">Home</a>
@@ -218,7 +333,7 @@
     </div>
     <div class="about-visual reveal d1">
       <div class="av-img">
-        <img src="assets/images/about-iso.jpg" alt="Isometric illustration of Easynet's connected IT services: servers, network, cloud and automation" data-parallax="0.06" data-scale="1.1">
+        <img src="assets/images/about-iso.jpg" alt="Isometric illustration of Easynet's connected IT services: servers, network, cloud and automation" width="1536" height="1024" loading="lazy" decoding="async" data-parallax="0.06" data-scale="1.1">
         <span class="av-badge"><span class="dot"></span>Connected Technology</span>
       </div>
       <div class="av-card">
@@ -819,7 +934,7 @@
   <div class="container">
     <div class="footer-grid">
       <div class="footer-brand">
-        <a class="brand" href="index.html"><img src="assets/images/logo.png" alt="Easynet IT Solutions"></a>
+        <a class="brand" href="index.html"><img src="assets/images/logo.png" alt="Easynet IT Solutions" width="512" height="176" loading="lazy" decoding="async"></a>
         <p>A 100% PNG-owned IT consulting, sales and services company — delivering software, infrastructure,
            cybersecurity and managed IT services to Papua New Guinea businesses.</p>
       </div>
@@ -866,5 +981,5 @@ Port Moresby, National Capital District, Papua New Guinea</span></li>
 </button>
 <script src="assets/js/main.js"></script>
 <script src="assets/js/whatsapp-chat.js"></script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3314ef2be3f23fe',t:'MTc4ODA2NjgyOQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>

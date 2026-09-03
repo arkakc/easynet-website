@@ -6,8 +6,8 @@
 const EASYNET = {
   name: "Easynet IT Solutions Limited",
   email: "hello.easynet@hotmail.com",
-  phone: "+675 72743186",             // TODO: replace with the company phone
-  whatsapp: "67572743186",               // TODO: replace with the WhatsApp number (country code + number, digits only)
+  phone: "+675 72743186",             // company phone (displayed via [data-easynet="phone"])
+  whatsapp: "67572743186",            // WhatsApp number (country code + number, digits only)
   whatsappMsg: "Hello Easynet IT Solutions! I would like to discuss a technology solution for my business.",
   address: "Port Moresby, Papua New Guinea"
 };
@@ -130,6 +130,19 @@ const io = new IntersectionObserver(entries => {
   });
 }, { threshold: 0.12 });
 document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+
+/* ---- Preselect service from ?service= query param (used by package buttons) ----
+   Kept in an external file because the site CSP is `script-src 'self'`
+   (inline scripts are blocked). Logic is identical to the previous inline tag. */
+(function () {
+  var s = new URLSearchParams(location.search).get("service");
+  if (!s) return;
+  var sel = document.getElementById("service");
+  if (!sel) return;
+  for (var i = 0; i < sel.options.length; i++) {
+    if (sel.options[i].text === s) { sel.selectedIndex = i; break; }
+  }
+})();
 
 /* ---- Contact form ---- */
 const sanitize = v => String(v)

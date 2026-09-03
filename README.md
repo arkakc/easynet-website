@@ -13,6 +13,8 @@ public/               ← THE WEBSITE (this folder is what gets deployed)
   404.html            Custom error page
   assets/             css / js / images
   robots.txt · sitemap.xml · security.txt · .well-known/
+  llms.txt            Plain-text company summary for AI assistants / LLMs
+  site.webmanifest    PWA manifest (installable, themed)
 
 vercel.json           Vercel config (security headers, caching, output dir = public)
 server.py             Optional secure local/dev server (python3 server.py)
@@ -80,6 +82,29 @@ fails it is still saved to the Sheet.
    `SMTP_PASS`. With neither configured, each email is saved to
    `data/outbox/enquiry-XXXXX.eml` so nothing is ever lost.
 4. `CONTACT_TO` overrides the destination (default hello.easynet@hotmail.com).
+
+---
+
+# SEO & AI / GEO (Generative Engine Optimisation)
+
+The site is built to rank in classic search **and** to be cited accurately by AI
+assistants (ChatGPT, Perplexity, Gemini, Claude, Google AI Overviews).
+
+| Lever | Where | Notes |
+|---|---|---|
+| Unique `<title>` + meta description per page | every page | keep under ~60 / ~160 chars |
+| Canonical URL + `hreflang` (`en-pg`, `x-default`) | every page | single-language geo-targeting |
+| `robots` meta (`index, follow, max-image-preview:large, max-snippet:-1`) | index/about/contact | lets engines show rich snippets |
+| schema.org JSON-LD | every page | `ProfessionalService`+`LocalBusiness`, `WebSite`, `WebPage` (+`speakable`), `FAQPage`, `AboutPage`, `ContactPage`, `BreadcrumbList`, full `OfferCatalog` of services & packages |
+| `llms.txt` | `public/llms.txt` | machine-readable company facts for LLMs; **update it whenever facts change** |
+| AI crawlers explicitly allowed | `public/robots.txt` | GPTBot, ClaudeBot, PerplexityBot, Google-Extended, etc. |
+| Image sitemap + `width`/`height` + `loading="lazy"` | `sitemap.xml`, pages | zero layout shift, rich image results |
+| Consistent NAP (name/address/phone) | pages + JSON-LD + `llms.txt` | keep identical everywhere |
+
+**Maintenance rule:** when the phone number, address, hours, team, services or
+packages change, update **all four** places — the page HTML, `main.js` `EASYNET`
+config, the JSON-LD blocks, and `llms.txt`. Inconsistent facts confuse both
+Google and AI engines.
 
 ---
 

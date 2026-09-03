@@ -1,6 +1,12 @@
 # ============================================================
 # Easynet IT Solutions — nginx server block (reference)
 # Copy into /etc/nginx/conf.d/easynet.conf and adjust paths
+#
+# NOTE on add_header: nginx does NOT inherit `add_header` from the
+# server level into a location block that declares its own. To keep
+# the security headers on EVERY response, caching is done with the
+# `expires` directive (which never clobbers add_header) and no
+# location block declares add_header of its own.
 # ============================================================
 
 server {
@@ -24,8 +30,8 @@ server {
     index index.html;
     autoindex off;                       # no directory listing
 
-    # ---- Security headers ----
-    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" always;
+    # ---- Security headers (inherited by every location below) ----
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" always;
     add_header X-Content-Type-Options nosniff always;
     add_header X-Frame-Options DENY always;
     add_header Referrer-Policy strict-origin-when-cross-origin always;
@@ -33,26 +39,39 @@ server {
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
     add_header Cross-Origin-Opener-Policy same-origin always;
     add_header Cross-Origin-Resource-Policy same-origin always;
-    add_header X-Powered-By "";           # hide server software
+    add_header X-Powered-By "" always;   # hide server software
+
+    # ---- RFC 9116 security.txt must stay reachable (exact match wins
+    #      over the dotfile regex below) ----
+    location = /.well-known/security.txt {
+        default_type text/plain;
+        expires 7d;
+        try_files $uri =404;
+    }
 
     # ---- Block sensitive files ----
     location ~* \.(md|sql|bak|log|env|py|sh|conf|ini|json|key|pem|p12|crt|cert|tar|gz|zip)$ {
-        deny all;
         return 404;
     }
-    location ~ /\. {                     # block dotfiles
-        deny all;
+    location ~ /\. {                     # block dotfiles / dot-directories
         return 404;
     }
 
-    # ---- Caching ----
-    location ~* \.(css|js|png|jpg|jpeg|webp|svg|ico|xml)$ {
-        add_header Cache-Control "public, max-age=604800";
+    # ---- Caching (expires only — never add_header here, or the
+    #      security headers above would be dropped for these files) ----
+    location ~* \.(css|js|png|jpg|jpeg|webp|svg|ico|woff2|webmanifest|xml)$ {
+        expires 7d;
         try_files $uri =404;
     }
 
     location / {
-        add_header Cache-Control "no-cache";
+        expires -1;                      # -> Cache-Control: no-cache for HTML
         try_files $uri $uri/ =404;
+    }
+
+    # ---- Custom error page ----
+    error_page 404 /404.html;
+    location = /404.html {
+        internal;
     }
 }

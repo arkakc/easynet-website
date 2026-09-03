@@ -1,0 +1,15 @@
+/* Easynet IT Solutions — 404 error page styles (external so the
+   strict `style-src 'self'` CSP permits them) */
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"LGEI Text","Segoe UI","Microsoft Sans Serif",sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(900px 500px at 80% -10%,rgba(20,115,232,.35),transparent 60%),linear-gradient(180deg,#04101F,#0A2547);color:#fff;text-align:center;padding:24px}
+  .box{max-width:520px}
+  .logo{height:44px;margin:0 auto 34px;display:block}
+  .code{font-size:clamp(70px,14vw,110px);font-weight:800;line-height:1;background:linear-gradient(90deg,#5EA0F2,#7CB342);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  h1{font-size:24px;margin:18px 0 12px}
+  p{color:rgba(255,255,255,.72);font-size:16px;line-height:1.6;margin-bottom:30px}
+  .btn{display:inline-block;background:linear-gradient(135deg,#0658C9,#1473E8);color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:14px 30px;border-radius:12px;box-shadow:0 8px 22px rgba(6,88,201,.35);transition:transform .2s}
+  .btn:hover{transform:translateY(-2px)}
+  .links{margin-top:26px;font-size:14px}
+  .links a{color:rgba(255,255,255,.6);text-decoration:none;margin:0 10px}
+  .links a:hover{color:#fff}
