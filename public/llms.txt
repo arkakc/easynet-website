@@ -49,10 +49,27 @@ Two delivery divisions cover eleven core services.
 
 Every service can also be purchased individually without a package.
 
+## Locations served
+
+Head office: Port Moresby, National Capital District (8 Mile, Gran Eden, Lot 110, Section 147).
+On-site delivery via a field project team, plus remote support and monitoring, across:
+
+- Port Moresby & NCD (Boroko, Waigani, Gordons, Konedobu, Hohola)
+- Lae & Morobe Province
+- Mount Hagen & Western Highlands
+- Goroka & Eastern Highlands
+- Madang
+- Kokopo & Rabaul (East New Britain), Kimbe (West New Britain)
+- Wewak (East Sepik), Vanimo (Sandaun)
+- Popondetta (Oro), Alotau (Milne Bay), Daru (Western)
+- Mendi (Southern Highlands), Kundiawa (Chimbu), Wabag (Enga)
+- Kavieng (New Ireland), Lorengau (Manus), Kerema (Gulf)
+
 ## Industries served
 
-Small and medium businesses, retail, professional services, construction, hotels,
-schools, NGOs and corporate offices.
+Small and medium businesses, retail and trade stores, professional services, construction,
+hotels and tourism, schools and universities, NGOs, corporate offices, mining and resources,
+oil and gas, agriculture and fisheries, banking and finance, and logistics and transport.
 
 ## Technology partners and platforms
 
@@ -77,6 +94,48 @@ agreement. Easynet remains the single accountable partner for the customer.
 3. Written proposal and quotation
 4. Implementation
 5. Ongoing support
+
+## Common questions (direct answers)
+
+- **How much does a business website cost in Papua New Guinea?** It depends on size and
+  features; a one-page business website launches quickly and affordably, while multi-page
+  sites with e-commerce, booking or ERP integration cost more. Easynet provides a fixed,
+  written quotation in kina after a free initial discussion.
+- **Who is a good IT company in Port Moresby?** Easynet IT Solutions Limited is a 100%
+  PNG-owned IT company in Port Moresby covering websites, digital marketing, ERP,
+  networking, cybersecurity and managed IT under one contract, with specialist consultants
+  engaged for advanced work.
+- **Who installs Starlink / satellite internet for business in PNG?** Easynet supplies,
+  installs and configures Starlink and other satellite or fixed-wireless internet,
+  including dish mounting, network integration, Wi-Fi distribution and failover.
+- **Who does CCTV installation in Port Moresby?** Easynet designs and installs CCTV and
+  security camera systems (placement, cabling, NVR/DVR, remote phone viewing) for offices,
+  shops, warehouses and homes.
+- **Which ERP is best for a PNG business?** ERPNext or Zoho for most PNG businesses —
+  flexible, affordable, and covering accounting, sales, purchasing, inventory, CRM, POS and
+  HR. Implementation runs in staged phases over weeks to months.
+- **Who supplies computers, laptops and office IT hardware in PNG?** Easynet supplies and
+  installs computers, laptops, printers, networking gear, servers and UPS, optionally as a
+  complete configured office setup.
+- **Is IT support available outside Port Moresby?** Yes — on-site via the field project team
+  in Lae, Mount Hagen, Goroka, Madang, Kokopo, Wewak and other towns, plus remote monitoring
+  and support from Port Moresby.
+- **How does engagement start?** A free initial discussion, then a recommendation, a written
+  proposal and quotation, implementation, and ongoing support.
+
+## Search topics this site covers
+
+IT company Papua New Guinea · IT services Port Moresby · IT support Port Moresby ·
+ICT company PNG · web design Port Moresby · website development Papua New Guinea ·
+web developer PNG · digital marketing Port Moresby · SEO and lead generation PNG ·
+ERP software PNG · ERPNext implementation PNG · business automation PNG · POS system PNG ·
+network installation Port Moresby · LAN and office Wi-Fi setup PNG · data cabling PNG ·
+server room setup PNG · firewall installation PNG · cybersecurity company PNG ·
+CCTV installation Port Moresby · Starlink installation Papua New Guinea ·
+satellite internet PNG · business internet PNG · Microsoft 365 PNG · cloud and AWS PNG ·
+backup solutions PNG · computer and laptop supplier Port Moresby · IT hardware supply PNG ·
+managed IT services PNG · IT consultant PNG · computer repair Port Moresby ·
+ICT for mining, agriculture, fisheries, banking, logistics, schools, hotels and NGOs.
 
 ## Pages
 
