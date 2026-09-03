@@ -3,32 +3,32 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
-    <loc>https://easynetsolutions.com.pg/</loc>
+    <loc>https://easynetpng.com/</loc>
     <lastmod>2026-09-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="en-pg" href="https://easynetsolutions.com.pg/"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://easynetsolutions.com.pg/"/>
+    <xhtml:link rel="alternate" hreflang="en-pg" href="https://easynetpng.com/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://easynetpng.com/"/>
     <image:image>
-      <image:loc>https://easynetsolutions.com.pg/assets/images/og-image.png</image:loc>
+      <image:loc>https://easynetpng.com/assets/images/og-image.png</image:loc>
       <image:title>Easynet IT Solutions Limited — Technology Solutions for Growing Businesses</image:title>
       <image:caption>100% PNG-owned IT company in Port Moresby, Papua New Guinea</image:caption>
     </image:image>
   </url>
   <url>
-    <loc>https://easynetsolutions.com.pg/about.html</loc>
+    <loc>https://easynetpng.com/about.html</loc>
     <lastmod>2026-09-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="en-pg" href="https://easynetsolutions.com.pg/about.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://easynetsolutions.com.pg/about.html"/>
+    <xhtml:link rel="alternate" hreflang="en-pg" href="https://easynetpng.com/about.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://easynetpng.com/about.html"/>
   </url>
   <url>
-    <loc>https://easynetsolutions.com.pg/contact.html</loc>
+    <loc>https://easynetpng.com/contact.html</loc>
     <lastmod>2026-09-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="en-pg" href="https://easynetsolutions.com.pg/contact.html"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://easynetsolutions.com.pg/contact.html"/>
+    <xhtml:link rel="alternate" hreflang="en-pg" href="https://easynetpng.com/contact.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://easynetpng.com/contact.html"/>
   </url>
 </urlset>

@@ -54,4 +54,4 @@ Allow: /
 User-agent: YouBot
 Allow: /
 
-Sitemap: https://easynetsolutions.com.pg/sitemap.xml
+Sitemap: https://easynetpng.com/sitemap.xml

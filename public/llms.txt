@@ -18,7 +18,7 @@ automated agents. All facts below are also published as schema.org JSON-LD on th
 - Phone / WhatsApp: +675 72743186
 - Email: hello.easynet@hotmail.com
 - Business hours: Monday to Friday, 8:30 AM – 5:00 PM (Port Moresby time)
-- Website: https://easynetsolutions.com.pg/
+- Website: https://easynetpng.com/
 
 ## Services
 
@@ -139,13 +139,13 @@ ICT for mining, agriculture, fisheries, banking, logistics, schools, hotels and 
 
 ## Pages
 
-- [Home](https://easynetsolutions.com.pg/): full service catalogue, packages, process, industries, partners and FAQ
-- [About Us](https://easynetsolutions.com.pg/about.html): company background, vision, mission, expertise, delivery model and team
-- [Contact Us](https://easynetsolutions.com.pg/contact.html): enquiry form, phone, WhatsApp, email and address
+- [Home](https://easynetpng.com/): full service catalogue, packages, process, industries, partners and FAQ
+- [About Us](https://easynetpng.com/about.html): company background, vision, mission, expertise, delivery model and team
+- [Contact Us](https://easynetpng.com/contact.html): enquiry form, phone, WhatsApp, email and address
 
 ## Machine-readable data
 
 - Structured data: schema.org JSON-LD (ProfessionalService, LocalBusiness, WebSite, WebPage,
   FAQPage, AboutPage, ContactPage, BreadcrumbList, OfferCatalog) embedded in every page
-- Sitemap: https://easynetsolutions.com.pg/sitemap.xml
-- Robots: https://easynetsolutions.com.pg/robots.txt (AI crawlers are explicitly permitted)
+- Sitemap: https://easynetpng.com/sitemap.xml
+- Robots: https://easynetpng.com/robots.txt (AI crawlers are explicitly permitted)

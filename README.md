@@ -149,7 +149,7 @@ Google and AI engines.
 
 ## Step 3 — Connect your custom domain
 1. In Vercel: your project → **Settings → Domains** → enter
-   `easynetsolutions.com.pg` → **Add**.
+   `easynetpng.com` → **Add**.
 2. Vercel shows DNS records. Add them at your domain registrar:
 
    | Type | Host/Name | Value |
@@ -164,7 +164,7 @@ Google and AI engines.
    URL — both work; the custom domain is primary.
 
 ## Step 4 — Post-launch checklist
-- [ ] Open https://easynetsolutions.com.pg/ and test all 3 pages + forms
+- [ ] Open https://easynetpng.com/ and test all 3 pages + forms
 - [ ] Test on your phone (Mobile View should activate automatically)
 - [ ] **Google Search Console**: verify the domain → submit `sitemap.xml`
       → Request Indexing on the 3 pages
