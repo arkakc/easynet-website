@@ -2,14 +2,17 @@
    Easynet IT Solutions — WhatsApp chat lead endpoint (Vercel)
    POST /api/whatsapp-lead
    ------------------------------------------------------------
-   Called by the WhatsApp chat widget (wa-fab) the moment the
-   client taps the SEND button, after name + phone have been
-   collected. Appends one row to the same Google Sheet used by
-   the contact form — via the Apps Script Web App — and returns
-   the reference number shown to the client on WhatsApp.
+   Called by the WhatsApp chat widget (wa-fab) twice:
 
-   Required : name, phone
-   Optional : email, company, service, message, page
+   1. CREATE — the client taps send on the phone question:
+        { name, phone, email?, company?, service?, page? }
+      → appends one row to the same Google Sheet used by the
+        contact form and returns its reference number.
+
+   2. UPDATE — every answer after the phone number is written
+      into that same row, under its own column:
+        { action: "update", ref: 12, email?, company?, service? }
+      → returns the same reference number.
 
    Environment variables (Vercel → Settings → Env Vars):
      SHEETS_WEBAPP_URL — Apps Script Web App URL (ends in /exec)
@@ -111,6 +114,48 @@ module.exports = async (req, res) => {
     message: sanitize(payload.message, 2000),
   };
 
+  const isUpdate = payload.action === "update" || payload.update === true;
+
+  /* ---------- 2) UPDATE: fill the rest of an existing row ---------- */
+  if (isUpdate) {
+    const ref = sanitize(
+      payload.ref != null ? payload.ref : payload.sequence_no, 20
+    );
+    if (!ref) {
+      return res.status(400).json({ ok: false, error: "Missing ref." });
+    }
+    if (data.email && !EMAIL_RE.test(data.email)) {
+      return res
+        .status(400)
+        .json({ ok: false, error: "Invalid email.", fields: ["email"] });
+    }
+    if (!SHEETS_WEBAPP_URL) {
+      console.error(
+        "[whatsapp-lead] SHEETS_WEBAPP_URL not set — row not updated"
+      );
+      return res.status(503).json({ ok: false, error: "storage_unavailable" });
+    }
+    try {
+      const out = await postToWebApp(SHEETS_WEBAPP_URL, {
+        secret: SHEETS_SECRET || undefined,
+        action: "update",
+        ref: ref,
+        source: SOURCE,
+        email: data.email,
+        company: data.company,
+        service: data.service,
+        message: data.message,
+      });
+      // Echo the row we updated (the Sheet answers with it as well).
+      const outRef = /^\d+$/.test(ref) ? parseInt(ref, 10) : ref;
+      return res.status(200).json({ ok: true, ref: outRef, updated: true });
+    } catch (err) {
+      console.error("[whatsapp-lead:update]", err && err.message);
+      return res.status(503).json({ ok: false, error: "storage_unavailable" });
+    }
+  }
+
+  /* ---------- 1) CREATE: name + phone → new row + Ref No. ---------- */
   // Only name + phone are compulsory in the chat — the rest may be blank.
   const missing = [];
   if (data.name.length < 2) missing.push("name");

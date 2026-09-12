@@ -1,18 +1,26 @@
 /* ============================================================
    Easynet WhatsApp Lead Chat — guided lead capture widget
    ------------------------------------------------------------
-   Collects contact data step-by-step (name · phone · optional
-   email & company · service), then the client taps the SEND
-   button and:
-     1. the lead is saved to Easynet's Google Sheet through
-        POST /api/whatsapp-lead  →  returns a reference number
-        (name + phone are the only required fields; the optional
-         ones are stored as blank cells in the same row)
-     2. WhatsApp opens with a short message containing that
-        reference number, so the team can reply instantly
-     3. the chat ends with a thank-you ("we'll contact you shortly")
-   If the save is unavailable the full enquiry is included in the
-   WhatsApp text instead, so a lead is never lost.
+   The chat runs like this:
+
+    1. "Hi! 👋 Thanks for reaching out to Easynet IT Solutions.
+        To help our team assist you faster — what's your full name?"
+    2. "Great, thanks! 📞 What's the best phone / WhatsApp number
+        for us to reach you?"
+        → the moment the client hits enter/send, NAME + PHONE are
+          saved to Easynet's Google Sheet (POST /api/whatsapp-lead),
+          creating the row and its Ref No.
+    3. the chat carries on: email (optional) → company (optional)
+       → which service?  👇
+    4. final SEND button → the rest of the answers are written into
+       THAT SAME ROW, beside the name and phone (email under Email,
+       company under Company, service under Service …)
+    5. then the client is redirected to WhatsApp (short message with
+       the Ref No.) and the chat ends with the thank-you:
+       "🎉 Thank you, John! Our team will contact you shortly."
+
+   If the Sheet cannot be reached the full enquiry is put in the
+   WhatsApp message instead, so a lead is never lost.
    ============================================================ */
 (function () {
   "use strict";
@@ -59,10 +67,17 @@
   var skipBtn = panel.querySelector(".wa-skip");
   var closeBtn = panel.querySelector(".wa-close");
 
-  /* step -1 = idle · data = answers · sending/done = send-button state */
-  var state = { step: -1, data: {}, started: false, sending: false, done: false };
+  var state = freshState();
   var timers = [];
   var ctaBtn = null;
+
+  function freshState() {
+    return {
+      step: -1, data: {}, started: false, sending: false, done: false,
+      ref: null,          // Ref No. of the row created after the phone number
+      createPromise: null // the save fired as soon as the phone was sent
+    };
+  }
 
   function now() {
     return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -74,6 +89,16 @@
     var d = document.createElement("div");
     d.className = "wa-msg " + cls;
     d.innerHTML = html + '<span class="wa-time">' + now() + (cls === "bot" ? ' ✓✓' : '') + '</span>';
+    body.appendChild(d);
+    scrollBottom();
+    return d;
+  }
+
+  /* small centred note, e.g. "✓ Your details are saved — Ref No. 12" */
+  function sysNote(html) {
+    var d = document.createElement("div");
+    d.className = "wa-sysnote";
+    d.innerHTML = html;
     body.appendChild(d);
     scrollBottom();
     return d;
@@ -105,34 +130,31 @@
   function esc(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : s; return d.innerHTML; }
 
   /* ---------- steps ---------- */
-  /* Name and phone are required — they are what gets saved to the Google
-     Sheet the moment the client taps the SEND button. Email, company and
-     the chosen service are optional extras for the same row. */
   var STEPS = [
-    { // 1 name (required)
+    { // 1 name — saved together with the phone number at step 2
       ask: "Hi! 👋 Thanks for reaching out to <b>Easynet IT Solutions</b>.<br>To help our team assist you faster — what's your <b>full name</b>?",
       type: "text", key: "name", label: "Your full name…", required: true,
       validate: function (v) { return v.length >= 2; }, err: "Please enter your name."
     },
-    { // 2 phone (required)
+    { // 2 phone — on enter/send, name + phone go to the Google Sheet
       ask: "Great, thanks! 📞 What's the best <b>phone / WhatsApp number</b> for us to reach you?",
       type: "text", key: "phone", label: "e.g. +675 7012 3456", required: true,
-      validate: validPhone, err: "Please enter a valid phone number."
+      validate: validPhone, err: "Please enter a valid phone number.", saveNow: true
     },
-    { // 3 email (skippable)
+    { // 3 email (skippable) — written into the same row at the final send
       ask: "And your <b>email address</b>? <span style='color:#667781;font-size:12.5px'>(optional — for our written quotation)</span>",
       type: "text", key: "email", label: "you@company.com.pg", required: false,
       validate: function (v) { return v === "" || validEmail(v); }, err: "That email doesn't look right."
     },
-    { // 4 company (skippable)
+    { // 4 company (skippable) — same row
       ask: "Which <b>company or business</b> do you represent? <span style='color:#667781;font-size:12.5px'>(optional)</span>",
       type: "text", key: "company", label: "e.g. Mako Trading Ltd", required: false
     },
-    { // 5 service (chips)
+    { // 5 service (chips) — same row
       ask: "Which service are you interested in? 👇",
       type: "chips", key: "service", required: true
     }
-    /* End of questions — the send button follows. */
+    /* End of questions — the final SEND button follows. */
   ];
 
   function showInput(step) {
@@ -179,6 +201,7 @@
     if (step.validate && !step.validate(v)) { fail(step.err); return; }
     state.data[step.key] = v;
     addMsg("user", esc(v) || "(skipped)");
+    if (step.saveNow) saveNameAndPhone();   // ← the phone was just sent
     advance();
   }
 
@@ -203,36 +226,67 @@
     }
   }
 
-  /* ---------- WhatsApp message text ---------- */
-  /* Short form — everything else is already saved in the Google Sheet. */
-  function buildShortMessage(ref) {
-    var d = state.data;
-    var lines = [
-      "Hi Easynet 👋 I just sent my enquiry through your website.",
-      "",
-      "Ref No. " + ref
-    ];
-    if (d.name) lines.push("👤 Name: " + d.name);
-    if (d.phone) lines.push("📞 Phone: " + d.phone);
-    if (d.service) lines.push("🛠 Service: " + d.service);
-    return lines.join("\n");
+  /* ---------- the API: one endpoint, two moments ---------- */
+  /* POST /api/whatsapp-lead — {name, phone, …} creates the row,
+     {action:"update", ref, email, company, service} fills the rest of it. */
+  function postLead(payload) {
+    return new Promise(function (resolve) {
+      var settled = false;
+      function settle(result) {
+        if (settled) return;
+        settled = true;
+        if (timer) clearTimeout(timer);
+        resolve(result);
+      }
+      var ctrl = null;
+      var timer = null;
+      try { ctrl = new AbortController(); } catch (e) { ctrl = null; }
+      if (ctrl) {
+        timer = setTimeout(function () { try { ctrl.abort(); } catch (e) {} }, SAVE_TIMEOUT_MS);
+      }
+      try {
+        fetch("/api/whatsapp-lead", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          keepalive: true,
+          signal: ctrl ? ctrl.signal : undefined
+        })
+          .then(function (r) { return r.json().catch(function () { return {}; }); })
+          .then(function (out) {
+            settle(out && out.ok === true
+              ? { ok: true, ref: out.ref || null, updated: out.updated === true }
+              : { ok: false, ref: null });
+          })
+          .catch(function () { settle({ ok: false, ref: null }); });
+      } catch (e) {
+        settle({ ok: false, ref: null });
+      }
+    });
   }
 
-  /* Long form — only used if the Google Sheet save failed, so the lead
-     still reaches the team instead of being lost. */
-  function buildFullMessage() {
-    var d = state.data;
-    return [
-      "📋 *New Enquiry — Easynet IT Solutions*",
-      "👤 Name: " + (d.name || "-"),
-      "📞 Phone: " + (d.phone || "-"),
-      "✉️ Email: " + (d.email || "-"),
-      "🏢 Company: " + (d.company || "-"),
-      "🛠 Service: " + (d.service || "-")
-    ].join("\n");
+  function baseBody() {
+    return { page: location.pathname + location.search, company_website: "" };
   }
 
-  /* ---------- summary + send button ---------- */
+  /* Step 2 — name + phone are saved the moment the phone is sent. */
+  function saveNameAndPhone() {
+    if (state.createPromise || state.ref) return;
+    var chat = state;                 // the chat this save belongs to
+    var payload = baseBody();
+    payload.name = state.data.name || "";
+    payload.phone = state.data.phone || "";
+    state.createPromise = postLead(payload).then(function (res) {
+      if (state !== chat) return res; // the chat was reset meanwhile — don't touch it
+      if (res.ok && res.ref) {
+        state.ref = res.ref;
+        sysNote("✓ Your details are saved — Ref No. " + esc(String(res.ref)));
+      }
+      return res;
+    });
+  }
+
+  /* ---------- summary + final send button ---------- */
   function showSummary() {
     var d = state.data;
     var card = document.createElement("div");
@@ -247,7 +301,7 @@
     body.appendChild(card);
     scrollBottom();
 
-    botReply("Everything looks good! ✅ Tap below to send your details to <b>Easynet</b> on WhatsApp — your enquiry is saved to our lead sheet and our team will contact you shortly.", function () {
+    botReply("All done! ✅ Tap below to finish — we'll save the rest of your details and open WhatsApp so you can chat with <b>Easynet</b> straight away.", function () {
       ctaBtn = document.createElement("button");
       ctaBtn.className = "wa-cta";
       ctaBtn.innerHTML = waIcon() + " Send on WhatsApp";
@@ -270,64 +324,85 @@
       : waIcon() + " Send on WhatsApp";
   }
 
-  /* ---------- the wa-send button ---------- */
+  /* ---------- final SEND: save the rest, then redirect to WhatsApp ---------- */
   function sendLead() {
     if (state.sending || state.done) return;
     state.sending = true;
     setCtaBusy(true);
 
-    // Open the WhatsApp tab inside the click gesture, so the browser
-    // doesn't treat it as a pop-up. Its address is filled in once the
-    // lead has been saved and the reference number is known.
+    // Start the WhatsApp tab inside the click gesture so the browser
+    // doesn't block it; its address is filled in once the save is done.
     var win = null;
     try { win = window.open("about:blank", "_blank"); } catch (e) { win = null; }
 
-    var payload = {
-      name: state.data.name || "",
-      phone: state.data.phone || "",
+    var rest = {
       email: state.data.email || "",
       company: state.data.company || "",
-      service: state.data.service || "",
-      page: location.pathname + location.search,
-      company_website: "" // honeypot
+      service: state.data.service || ""
     };
 
-    var settled = false;
-    var ctrl = null;
-    var timer = null;
-    try { ctrl = new AbortController(); } catch (e) { ctrl = null; }
-    if (ctrl) {
-      timer = setTimeout(function () { try { ctrl.abort(); } catch (e) {} }, SAVE_TIMEOUT_MS);
-    }
+    // Wait for the early save (name + phone) if it is still in flight.
+    var first = state.createPromise || Promise.resolve({ ok: false, ref: null });
 
-    function finish(ref, failed) {
-      if (settled) return;
-      settled = true;
-      if (timer) clearTimeout(timer);
-      state.sending = false;
-      showThanks(ref, win, failed);
-    }
-
-    try {
-      fetch("/api/whatsapp-lead", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        keepalive: true,
-        signal: ctrl ? ctrl.signal : undefined
+    first
+      .then(function (res) {
+        if (!state.ref && res && res.ok && res.ref) state.ref = res.ref;
+        if (state.ref) {
+          // The row exists → write the rest of the answers beside it.
+          var payload = baseBody();
+          payload.action = "update";
+          payload.ref = state.ref;
+          payload.email = rest.email;
+          payload.company = rest.company;
+          payload.service = rest.service;
+          return postLead(payload).then(function (out) {
+            return { ref: state.ref, restSaved: !!(out && out.ok) };
+          });
+        }
+        // The early save never landed → create the row now, with everything.
+        var payload = baseBody();
+        payload.name = state.data.name || "";
+        payload.phone = state.data.phone || "";
+        payload.email = rest.email;
+        payload.company = rest.company;
+        payload.service = rest.service;
+        return postLead(payload).then(function (out) {
+          var ok = !!(out && out.ok);
+          return { ref: ok ? (out.ref || state.ref) : state.ref, restSaved: ok };
+        });
       })
-        .then(function (r) { return r.json().catch(function () { return {}; }); })
-        .then(function (out) {
-          if (out && out.ok === true && out.ref) finish(out.ref, false);
-          else finish(null, true); // not saved → put the details in the WhatsApp text
-        })
-        .catch(function () { finish(null, true); });
-    } catch (e) {
-      finish(null, true);
-    }
+      .then(function (r) {
+        state.sending = false;
+        showThanks(r.ref, r.restSaved, win);
+      });
   }
 
-  /* ---------- open WhatsApp + close the chat ---------- */
+  /* ---------- WhatsApp handoff + closing thank-you ---------- */
+  /* Short form — everything is already in the Sheet row. */
+  function buildShortMessage(ref) {
+    var d = state.data;
+    var lines = ["Hi Easynet 👋 I just sent my enquiry through your website.", ""];
+    if (ref) lines.push("Ref No. " + ref);
+    if (d.name) lines.push("👤 Name: " + d.name);
+    if (d.phone) lines.push("📞 Phone: " + d.phone);
+    if (d.service) lines.push("🛠 Service: " + d.service);
+    return lines.join("\n");
+  }
+
+  /* Long form — used when the Sheet does not hold the full record, so
+     nothing is lost. */
+  function buildFullMessage(ref) {
+    var d = state.data;
+    var out = ["📋 *New Enquiry — Easynet IT Solutions*"];
+    if (ref) out.push("🔖 Ref No: " + ref);
+    out.push("👤 Name: " + (d.name || "-"));
+    out.push("📞 Phone: " + (d.phone || "-"));
+    out.push("✉️ Email: " + (d.email || "-"));
+    out.push("🏢 Company: " + (d.company || "-"));
+    out.push("🛠 Service: " + (d.service || "-"));
+    return out.join("\n");
+  }
+
   function openWhatsApp(url, win) {
     try {
       if (win && !win.closed) {
@@ -341,26 +416,21 @@
     return !!w;
   }
 
-  function showThanks(ref, win, failed) {
+  function showThanks(ref, restSaved, win) {
     state.done = true;
     var name = state.data.name || "there";
     var url = "https://wa.me/" + CFG.whatsapp +
-      "?text=" + encodeURIComponent(failed ? buildFullMessage() : buildShortMessage(ref));
+      "?text=" + encodeURIComponent(restSaved ? buildShortMessage(ref) : buildFullMessage(ref));
 
     var opened = openWhatsApp(url, win);
 
     inputRow.style.display = "none";
-    if (ctaBtn) { ctaBtn.disabled = true; ctaBtn.remove(); ctaBtn = null; }
+    if (ctaBtn) { ctaBtn.remove(); ctaBtn = null; }
 
     if (!opened) {
       addMsg("bot", "👉 <a href='" + url + "' target='_blank' rel='noopener'><b>Tap here to open WhatsApp</b></a> and send your enquiry message.");
     }
-
-    if (ref) {
-      addMsg("bot", "📤 <b>Enquiry sent!</b> Your reference number is <b>#" + esc(String(ref)) + "</b> — your details are saved for our team.");
-    } else if (failed) {
-      addMsg("bot", "📤 <b>Enquiry sent!</b> Your details are in the WhatsApp message we just opened for you.");
-    }
+    if (ref && restSaved) sysNote("✓ Saved to our leads — Ref No. " + esc(String(ref)));
 
     var reach = [];
     if (CFG.email) reach.push("<a href='mailto:" + esc(CFG.email) + "'>" + esc(CFG.email) + "</a>");
@@ -389,7 +459,7 @@
   }
   function resetChat() {
     body.innerHTML = "";
-    state = { step: -1, data: {}, started: false, sending: false, done: false };
+    state = freshState();
     ctaBtn = null;
     inputRow.style.display = "none";
   }

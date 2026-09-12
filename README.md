@@ -79,6 +79,10 @@ with the WhatsApp chat widget (see below). Columns, in order:
 | `Name` · `Phone` · `Email` · `Company` · `Service` · `Message` | the enquiry fields (optional ones may be blank) |
 | `Page URL` · `User Agent` · `Details` | where it came from, browser, raw payload |
 
+A **WhatsApp chat row is created when the client sends their phone number** and
+is **completed at the end of the chat** (see the next section) — so a chat that
+is abandoned half-way still leaves name + phone in the Sheet.
+
 If the Sheet is temporarily unreachable the enquiry is still emailed (with a
 `T########` fallback reference); if email fails it is still saved to the Sheet.
 An older Sheet (created before the friendly headings) is upgraded in place on
@@ -104,25 +108,40 @@ deleted.
 # WhatsApp chat widget (`wa-fab`)
 
 The green WhatsApp bubble on every page opens a guided chat
-(`public/assets/js/whatsapp-chat.js`) that collects the lead step by step —
-exactly as the client sees it:
+(`public/assets/js/whatsapp-chat.js`). It saves to the Google Sheet in **two
+moments**, exactly as the chat runs:
 
-1. **Full name** *(required)*
-2. **Phone / WhatsApp number** *(required)* — everything from here on is stored
-   in the same row of the Google Sheet
-3. **Email address** *(optional — for our written quotation)*
-4. **Company or business** *(optional)*
-5. **Which service are you interested in?** (chips, same list as `main.js`)
+```
+Hi! 👋 Thanks for reaching out to Easynet IT Solutions.
+To help our team assist you faster — what's your full name?
+                        ← arka
+Great, thanks! 📞 What's the best phone / WhatsApp number for us to reach you?
+                        ← 41411651        ★ the moment this is sent,
+                                            NAME + PHONE are saved to the
+                                            Google Sheet → row + Ref No. #12
+                        →
+And your email address? (optional — for our written quotation)
+Which company or business do you represent? (optional)
+Which service are you interested in? 👇
+                        ★ final SEND button → the rest of the answers are
+                          written into THAT SAME ROW, beside the name and
+                          phone, each under its own column
+                        →
+                        ★ then WhatsApp opens (short message + Ref No.)
+                        ★ and the chat ends:
+                          "🎉 Thank you, John! Our team will contact you shortly."
+```
 
-Then the enquiry card appears with the **SEND button**. The moment the client
-taps it:
-
-1. the lead is **saved to the Google Sheet** through
-   **`POST /api/whatsapp-lead`** (`api/whatsapp-lead.js` on Vercel,
-   `server.py` locally) → source **`WhatsApp chat`**, with a **Ref No.**
-   Name + phone are the only required fields; anything the client skipped is
-   stored as a blank cell in the same row.
-2. **WhatsApp opens** with a short message that carries that Ref No.:
+1. **Name** and **2. Phone / WhatsApp number** — when the phone is sent
+   (enter or the send button), **`POST /api/whatsapp-lead`** creates the row:
+   `Ref No.`, `Date & Time`, `Source = WhatsApp chat`, `Name`, `Phone`. The
+   client sees a small note: *"✓ Your details are saved — Ref No. 12"*.
+2. **Email** *(optional)* · **Company** *(optional)* · **Service** — then the
+   final **SEND** button posts `{ action: "update", ref: 12, email, company,
+   service }`, so the answers land **next to the name and phone in the same
+   row** (`EMAIL` under `Email`, `COMPANY` under `Company`, `SERVICE` under
+   `Service`). Skipped answers are simply left blank.
+3. **Redirect to WhatsApp** with a short message carrying the Ref No.:
 
    ```
    Hi Easynet 👋 I just sent my enquiry through your website.
@@ -132,13 +151,18 @@ taps it:
    📞 Phone: +675 7012 3456
    🛠 Service: IT Infrastructure
    ```
-3. the chat **ends with the thank-you message**:
+4. The chat **ends with the thank-you message**:
    *"🎉 Thank you, John! Our team will contact you shortly."*
 
-If the Sheet (or the endpoint) is unavailable, the widget does **not** lose the
-lead: WhatsApp still opens, with the full structured enquiry inside the message
-instead of the short version. Closing and reopening the widget starts a fresh
-enquiry.
+Nothing is lost if the Sheet is unreachable:
+
+| When it fails | What happens |
+|---|---|
+| The early save (name + phone) | The final SEND creates the row with **all** the answers instead |
+| The final update | The row keeps name + phone, and the WhatsApp message carries the Ref No. **and** the missing details |
+| The whole endpoint | WhatsApp still opens with the full structured enquiry inside the message |
+
+Closing and reopening the widget starts a fresh enquiry.
 
 There is **no "anything you'd like us to know about your project?" step** — the
 message field is reserved for the contact form and the WhatsApp Cloud API

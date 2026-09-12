@@ -12,9 +12,11 @@ Production-ready static server with:
     your Google Sheet (google-apps-script/Code.gs) and emails it;
     falls back to data/enquiries.csv if the Sheet is not configured
   • WhatsApp chat endpoint POST /api/whatsapp-lead → saves each lead
-    from the wa-fab chat widget (name + phone required, the rest
-    optional) as a row in the same Google Sheet, with a reference
-    number; falls back to data/whatsapp-leads.csv
+    from the wa-fab chat widget into the same Google Sheet. The row is
+    created the moment the client taps send on the phone question
+    (name + phone), and every answer after that (email, company,
+    service) is written into the same row under its own column via
+    {action: "update", ref: n}; falls back to data/whatsapp-leads.csv
 
 Run:  python3 server.py [port]     (default 8000, binds 0.0.0.0)
 """
@@ -170,6 +172,57 @@ def save_whatsapp_lead_sheets(data, user_agent=""):
     if not isinstance(out, dict) or not out.get("ok"):
         raise RuntimeError("Sheets web app error: %s" % (out or "empty response"))
     return int(out.get("ref") or out.get("seq") or 0)
+
+
+def update_whatsapp_lead_sheets(ref, data, user_agent=""):
+    """Write the answers that follow the phone number into the SAME Sheet row.
+
+    (email → Email column, company → Company column, service → Service column…)
+    Raises on failure so the caller can fall back to the local CSV.
+    """
+    out = sheets_post(SHEETS_WEBAPP_URL, {
+        "secret": SHEETS_SECRET or None,
+        "action": "update",
+        "ref": str(ref),
+        "source": "whatsapp-chat",
+        "email": data.get("email", ""),
+        "company": data.get("company", ""),
+        "service": data.get("service", ""),
+        "message": data.get("message", ""),
+        "user_agent": _sanitize(user_agent, 300),
+    })
+    if not isinstance(out, dict) or not out.get("ok"):
+        raise RuntimeError("Sheets web app error: %s" % (out or "empty response"))
+    return ref  # the row that was updated
+
+
+def update_whatsapp_lead_csv(ref, data):
+    """Same as above for the local CSV fallback (data/whatsapp-leads.csv)."""
+    with CSV_LOCK:
+        path = os.path.join(DATA_DIR, WA_CSV_FILE)
+        if not os.path.isfile(path):
+            raise OSError("no local leads file yet")
+        with open(path, newline="", encoding="utf-8") as f:
+            rows = list(csv.reader(f))
+        header = rows[0] if rows else WA_CSV_HEADER
+        index = {name: i for i, name in enumerate(header)}
+        found = False
+        for row in rows[1:]:
+            if row and row[0].strip() == str(ref).strip():
+                for key in ("email", "company", "service", "message"):
+                    value = (data.get(key) or "").strip()
+                    if not value or key not in index:
+                        continue  # a skipped answer never erases the column
+                    while len(row) <= index[key]:
+                        row.append("")
+                    row[index[key]] = value
+                found = True
+                break
+        if not found:
+            raise OSError("ref %s not found in the local leads file" % ref)
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            csv.writer(f).writerows(rows)
+        return ref
 
 
 def save_whatsapp_lead(data):
@@ -497,8 +550,14 @@ class SecureHandler(http.server.SimpleHTTPRequestHandler):
             self._json_response(200, {"ok": True, "ref": None})
             return
 
-        # Only name + phone are compulsory in the chat; the optional
-        # fields may stay blank and are simply written as empty cells.
+        # 2) UPDATE — the answers after the phone number are written into the
+        # row created when the client tapped send on the phone question.
+        if payload.get("action") == "update" or payload.get("update") is True:
+            return self._update_whatsapp_lead(payload)
+
+        # 1) CREATE — name + phone from the chat create the row + ref no.
+        # Only name + phone are compulsory; the optional fields may stay
+        # blank and are simply written as empty cells.
         data = {
             "name": _sanitize(payload.get("name"), 80),
             "phone": _sanitize(payload.get("phone"), 25),
@@ -546,6 +605,44 @@ class SecureHandler(http.server.SimpleHTTPRequestHandler):
                 return
 
         self._json_response(200, {"ok": True, "ref": ref, "storage": stored_in})
+
+    def _update_whatsapp_lead(self, payload):
+        """Write email / company / service into the row of an existing ref."""
+        ref = _sanitize(payload.get("ref", payload.get("sequence_no", "")), 20)
+        if not ref:
+            self._json_response(400, {"ok": False, "error": "Missing ref."})
+            return
+        data = {
+            "email": _sanitize(payload.get("email"), 120),
+            "company": _sanitize(payload.get("company"), 80),
+            "service": _sanitize(payload.get("service"), 80),
+            "message": _sanitize(payload.get("message"), 2000),
+        }
+        if data["email"] and not re.match(r"^[^\s@]+@[^\s@]+\.[^\s@]+$", data["email"]):
+            self._json_response(400, {"ok": False,
+                                      "error": "Invalid email.",
+                                      "fields": ["email"]})
+            return
+
+        user_agent = self.headers.get("User-Agent", "") or ""
+        if SHEETS_WEBAPP_URL:
+            try:
+                out_ref = update_whatsapp_lead_sheets(ref, data, user_agent)
+                sys.stderr.write("[sheets] WhatsApp lead #%s completed in Google Sheet\n" % ref)
+                self._json_response(200, {"ok": True, "ref": out_ref, "updated": True,
+                                          "storage": "google-sheets"})
+                return
+            except Exception as exc:  # noqa: BLE001 — fall back so nothing is lost
+                sys.stderr.write("[sheets] WhatsApp lead update failed for #%s: %s\n" % (ref, exc))
+        try:
+            update_whatsapp_lead_csv(ref, data)
+            sys.stderr.write("[csv] WhatsApp lead #%s completed in %s\n"
+                             % (ref, os.path.join(DATA_DIR, WA_CSV_FILE)))
+            self._json_response(200, {"ok": True, "ref": ref, "updated": True,
+                                      "storage": "csv"})
+        except OSError as exc:
+            sys.stderr.write("[csv] WhatsApp lead update failed for #%s: %s\n" % (ref, exc))
+            self._json_response(503, {"ok": False, "error": "storage_unavailable"})
 
 
 if __name__ == "__main__":

@@ -8,8 +8,14 @@
  *
  *   • Website enquiry form   → source "Website form"
  *   • WhatsApp chat widget   → source "WhatsApp chat"
- *     (saved the moment the client taps the wa-send button —
- *      name + phone are required, everything else may be blank)
+ *     Saved in two moments, exactly as the chat runs:
+ *       1. the client sends their PHONE NUMBER (name + phone are
+ *          the row's first two data fields) → a row is created
+ *          with its Ref No.
+ *       2. at the end of the chat every remaining answer (email,
+ *          company, service) is written into that same row, under
+ *          its own column, with
+ *              { action: "update", ref: <Ref No.>, … }
  *
  * ── ONE-TIME SETUP (about 3 minutes) ─────────────────────────
  * 1. Create a Google Sheet, e.g. "Easynet — Website Enquiries".
@@ -90,6 +96,14 @@ function doPost(e) {
     if (SHARED_SECRET && body.secret !== SHARED_SECRET) {
       return json_({ ok: false, error: "unauthorized" });
     }
+    /* An existing lead is completed as the chat continues: the widget saves
+       name + phone first (creating the row + Ref No.) and then writes the
+       answers that follow — email, company, service — into the SAME row,
+       each one under its own column. */
+    if (body.action === "update" || body.update === true) {
+      var updated = updateLead_(body);
+      return json_({ ok: true, ref: updated, seq: updated, updated: true });
+    }
     var seq = appendLead_(body);
     return json_({ ok: true, ref: seq, seq: seq });
   } catch (err) {
@@ -137,6 +151,50 @@ function appendLead_(body) {
       return v === undefined || v === null ? "" : String(v).slice(0, 5000);
     }));
     return seq;
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/**
+ * Writes the answers that arrive after the phone number — email, company,
+ * service, message — into the row already created for this lead, each one
+ * under its own column heading.
+ *
+ * Only the fields present in the request are written, so an empty/skipped
+ * answer never erases what is already in the row.
+ */
+function updateLead_(body) {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    var ref = String(body.ref != null ? body.ref : body.sequence_no || "").trim();
+    if (!ref) throw new Error("update needs the lead's ref");
+
+    var sheet = getOrCreateSheet_();
+    ensureHeaders_(sheet);
+    var lastRow = sheet.getLastRow();
+    if (lastRow < 2) throw new Error("no leads in the sheet yet (ref " + ref + ")");
+
+    // Find the row whose "Ref No." column holds this reference.
+    var refs = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+    var row = -1;
+    for (var i = 0; i < refs.length; i++) {
+      if (String(refs[i][0]).trim() === ref) { row = i + 2; break; }
+    }
+    if (row === -1) throw new Error("unknown ref " + ref);
+
+    // Columns the chat is allowed to fill in later — never the Ref No.,
+    // the original date/time or the channel.
+    var updatable = ["name", "phone", "email", "company", "service", "message",
+                     "page", "user_agent", "raw"];
+    FIELDS.forEach(function (key, idx) {
+      if (updatable.indexOf(key) === -1) return;
+      var v = body[key];
+      if (v === undefined || v === null || String(v).trim() === "") return; // keep what's there
+      sheet.getRange(row, idx + 1).setValue(String(v).slice(0, 5000));
+    });
+    return parseInt(ref, 10) || ref;
   } finally {
     lock.releaseLock();
   }
@@ -221,6 +279,17 @@ function testAppend() {
     message: "If you can read this row, lead capture works. You can delete it.",
   });
   Logger.log("Appended test lead with Ref No. = %s", ref);
+}
+
+/** Run from the editor to test completing an existing lead (uses Ref No. 1). */
+function testUpdate() {
+  var ref = updateLead_({
+    ref: 1,
+    email: "completed@example.com",
+    company: "Completed Co",
+    service: "Managed IT Support",
+  });
+  Logger.log("Updated Ref No. %s — check that the email/company/service columns filled in.", ref);
 }
 
 /** Run from the editor to check/repair the column headings without adding a row. */

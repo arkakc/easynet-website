@@ -6,22 +6,36 @@ How the pieces fit together:
 Customer clicks green WhatsApp bubble on your website
         │
         ▼
-Guided chat collects: Name · Phone · (optional) Email · (optional) Company · Service
-        │  (auto-replies advance each step)
-        ▼
-Customer taps the SEND button  (wa-send)
-        │
-        ├──► 1. POST /api/whatsapp-lead  →  one row in the Google Sheet
-        │         (source "WhatsApp chat", Ref No. assigned by the Sheet)
-        │
-        └──► 2. WhatsApp opens with a SHORT message + that Ref No.
-                  Hi Easynet 👋 I just sent my enquiry…
-                  Ref No. 12 · Name · Phone · Service
+Chat asks: full name  →  phone / WhatsApp number
         │
         ▼
-Easynet's WhatsApp Business receives the lead — and the full record is
-already in the Sheet, so the chat itself ends with the thank-you message
-("our team will contact you shortly")
+★ The phone number is SENT
+        │
+        └──► POST /api/whatsapp-lead  →  the NAME + PHONE are saved to the
+              Google Sheet right away: new row with Ref No. + Date & Time
+              (the client sees "✓ Your details are saved — Ref No. 12")
+        │
+        ▼
+Chat carries on: email (optional) · company (optional) · service
+        │
+        ▼
+★ Final SEND button
+        │
+        └──► POST /api/whatsapp-lead { action: "update", ref: 12, … }
+              → email / company / service are written into THAT SAME ROW,
+                beside the name and phone, each under its own column
+        │
+        ▼
+★ Redirect to WhatsApp with a SHORT message + the Ref No.
+        Hi Easynet 👋 I just sent my enquiry through your website.
+        Ref No. 12 · Name · Phone · Service
+        │
+        ▼
+Chat ends: "🎉 Thank you, John! Our team will contact you shortly."
+        │
+        ▼
+Easynet's WhatsApp Business receives the message — and the complete record
+is already in the Sheet
         │
         ├──► Option A: Your team sees it and replies (works TODAY, zero cost)
         │
