@@ -6,16 +6,36 @@ How the pieces fit together:
 Customer clicks green WhatsApp bubble on your website
         │
         ▼
-Guided chat collects: Name · Phone · Email · Company · Service · Message
-        │  (auto-replies advance each step)
-        ▼
-Customer taps "Send on WhatsApp"
-        │
-        ├──► Their phone opens WhatsApp with a pre-filled STRUCTURED message
-        │         (📋 New Enquiry — Name / Phone / Email / Company / Service / Message)
+Chat asks: full name  →  phone / WhatsApp number
         │
         ▼
-Easynet's WhatsApp Business receives the structured lead
+★ The phone number is SENT
+        │
+        └──► POST /api/whatsapp-lead  →  the NAME + PHONE are saved to the
+              Google Sheet right away: new row with Ref No. + Date & Time
+              (the client sees "✓ Your details are saved — Ref No. 12")
+        │
+        ▼
+Chat carries on: email (optional) · company (optional) · service
+        │
+        ▼
+★ Final SEND button
+        │
+        └──► POST /api/whatsapp-lead { action: "update", ref: 12, … }
+              → email / company / service are written into THAT SAME ROW,
+                beside the name and phone, each under its own column
+        │
+        ▼
+★ Redirect to WhatsApp with a SHORT message + the Ref No.
+        Hi Easynet 👋 I just sent my enquiry through your website.
+        Ref No. 12 · Name · Phone · Service
+        │
+        ▼
+Chat ends: "🎉 Thank you, John! Our team will contact you shortly."
+        │
+        ▼
+Easynet's WhatsApp Business receives the message — and the complete record
+is already in the Sheet
         │
         ├──► Option A: Your team sees it and replies (works TODAY, zero cost)
         │
@@ -73,13 +93,16 @@ In production run it under `pm2` / systemd and front it with nginx + TLS
 node server.js &
 # simulate Meta verification
 curl "http://localhost:3000/webhook?hub.mode=subscribe&hub.verify_token=easynet-verify-2026&hub.challenge=123"
-# simulate a lead from the website widget
+# simulate a lead from the website widget (short form — the whole record is
+# already saved in the Google Sheet when the client taps the wa-send button)
 curl -X POST http://localhost:3000/webhook -H 'Content-Type: application/json' -d '{
   "entry":[{"changes":[{"value":{
     "contacts":[{"phone_jid":"675701234567@s.whatsapp.net"}],
-    "messages":[{"type":"text","text":{"body":"📋 *New Enquiry — Easynet IT Solutions*\n👤 Name: John Mako\n📞 Phone: +675 7012 3456\n✉️ Email: john@mako.com.pg\n🏢 Company: Mako Trading\n🛠 Service: IT Infrastructure\n💬 Message: Need network + CCTV for new office"}}]}
+    "messages":[{"type":"text","text":{"body":"Hi Easynet 👋 I just sent my enquiry through your website.\n\nRef No. 12\n👤 Name: John Mako\n📞 Phone: +675 7012 3456\n🛠 Service: IT Infrastructure"}}]}
   }}]"
 }'
+# the fallback form (used only when the Sheet save was unavailable) is parsed too:
+#   📋 *New Enquiry — Easynet IT Solutions* / 👤 Name / 📞 Phone / ✉️ Email / 🏢 Company / 🛠 Service
 # view captured leads
 curl "http://localhost:3000/leads?token=easynet"
 ```
