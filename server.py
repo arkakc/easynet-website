@@ -11,6 +11,10 @@ Production-ready static server with:
   • Contact form endpoint POST /api/contact → saves each enquiry to
     your Google Sheet (google-apps-script/Code.gs) and emails it;
     falls back to data/enquiries.csv if the Sheet is not configured
+  • WhatsApp chat endpoint POST /api/whatsapp-lead → saves each lead
+    from the wa-fab chat widget (name + phone required, the rest
+    optional) as a row in the same Google Sheet, with a reference
+    number; falls back to data/whatsapp-leads.csv
 
 Run:  python3 server.py [port]     (default 8000, binds 0.0.0.0)
 """
@@ -37,6 +41,11 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 ENQUIRIES_CSV = os.path.join(DATA_DIR, "enquiries.csv")
 OUTBOX_DIR = os.path.join(DATA_DIR, "outbox")   # emails saved here if SMTP not configured
 CSV_HEADER = ["sequence_no", "timestamp", "name", "company", "email", "phone", "service", "message"]
+# WhatsApp chat widget leads (POST /api/whatsapp-lead). Same Google Sheet as
+# the contact form; this CSV is only the local fallback storage.
+WA_CSV_FILE = "whatsapp-leads.csv"
+WA_CSV_HEADER = ["ref", "timestamp", "source", "name", "phone", "email",
+                 "company", "service", "message", "page"]
 CSV_LOCK = threading.Lock()
 
 CONTACT_TO = os.environ.get("CONTACT_TO", "hello.easynet@hotmail.com")
@@ -136,6 +145,59 @@ def save_enquiry(data):
                 writer.writerow(CSV_HEADER)
             writer.writerow(row)
         return seq
+
+
+def save_whatsapp_lead_sheets(data, user_agent=""):
+    """Append a WhatsApp chat lead to the Google Sheet; returns its reference no.
+
+    Raises on any failure so the caller can fall back to the local CSV.
+    Name + phone are the only compulsory fields — the optional ones from the
+    widget (email, company, service, message) are simply written as blank cells.
+    """
+    out = sheets_post(SHEETS_WEBAPP_URL, {
+        "secret": SHEETS_SECRET or None,
+        "source": "whatsapp-chat",
+        "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "name": data.get("name", ""),
+        "phone": data.get("phone", ""),
+        "email": data.get("email", ""),
+        "company": data.get("company", ""),
+        "service": data.get("service", ""),
+        "message": data.get("message", ""),
+        "page": data.get("page", ""),
+        "user_agent": _sanitize(user_agent, 300),
+    })
+    if not isinstance(out, dict) or not out.get("ok"):
+        raise RuntimeError("Sheets web app error: %s" % (out or "empty response"))
+    return int(out.get("ref") or out.get("seq") or 0)
+
+
+def save_whatsapp_lead(data):
+    """Append a WhatsApp chat lead to data/whatsapp-leads.csv.
+
+    Fallback storage — used only when the Google Sheet is unreachable or
+    SHEETS_WEBAPP_URL is not configured. Returns the reference number.
+    """
+    with CSV_LOCK:
+        os.makedirs(DATA_DIR, exist_ok=True)
+        path = os.path.join(DATA_DIR, WA_CSV_FILE)
+        new_file = not os.path.isfile(path)
+        ref = 1
+        if not new_file:
+            with open(path, newline="", encoding="utf-8") as f:
+                ref = sum(1 for _ in csv.reader(f))  # header counts as row 1
+        row = [ref,
+               datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
+               "WhatsApp chat",
+               data.get("name", ""), data.get("phone", ""), data.get("email", ""),
+               data.get("company", ""), data.get("service", ""),
+               data.get("message", ""), data.get("page", "")]
+        with open(path, "a", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            if new_file:
+                writer.writerow(WA_CSV_HEADER)
+            writer.writerow(row)
+        return ref
 
 
 def build_email(seq, data):
@@ -349,22 +411,35 @@ class SecureHandler(http.server.SimpleHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_POST(self):
-        if self.path.split("?")[0] != "/api/contact":
-            self.send_error(404, "Not found.")
-            return
+        path = self.path.split("?")[0]
+        if path == "/api/contact":
+            return self._handle_contact()
+        if path == "/api/whatsapp-lead":
+            return self._handle_whatsapp_lead()
+        self.send_error(404, "Not found.")
+
+    def _json_body(self):
+        """Read and parse the JSON request body (sends 400 and returns None on error)."""
         try:
             length = int(self.headers.get("Content-Length", 0))
         except (TypeError, ValueError):
             length = 0
         if length <= 0 or length > MAX_BODY:
             self._json_response(400, {"ok": False, "error": "Invalid request body."})
-            return
+            return None
         try:
             payload = json.loads(self.rfile.read(length).decode("utf-8"))
             if not isinstance(payload, dict):
                 raise ValueError
         except (ValueError, UnicodeDecodeError):
             self._json_response(400, {"ok": False, "error": "Invalid JSON."})
+            return None
+        return payload
+
+    # ---- Contact form endpoint: POST /api/contact ----
+    def _handle_contact(self):
+        payload = self._json_body()
+        if payload is None:
             return
 
         # honeypot — silently accept and drop bot submissions
@@ -410,6 +485,67 @@ class SecureHandler(http.server.SimpleHTTPRequestHandler):
         # send the email in the background so the visitor gets an instant response
         threading.Thread(target=send_enquiry_email, args=(seq, data), daemon=True).start()
         self._json_response(200, {"ok": True, "sequence_no": seq, "storage": stored_in})
+
+    # ---- WhatsApp chat widget endpoint: POST /api/whatsapp-lead ----
+    def _handle_whatsapp_lead(self):
+        payload = self._json_body()
+        if payload is None:
+            return
+
+        # honeypot — silently accept and drop bot submissions
+        if str(payload.get("company_website", "")).strip():
+            self._json_response(200, {"ok": True, "ref": None})
+            return
+
+        # Only name + phone are compulsory in the chat; the optional
+        # fields may stay blank and are simply written as empty cells.
+        data = {
+            "name": _sanitize(payload.get("name"), 80),
+            "phone": _sanitize(payload.get("phone"), 25),
+            "email": _sanitize(payload.get("email"), 120),
+            "company": _sanitize(payload.get("company"), 80),
+            "service": _sanitize(payload.get("service"), 80),
+            "message": _sanitize(payload.get("message"), 2000),
+            "page": _sanitize(payload.get("page"), 200),
+        }
+        missing = []
+        if len(data["name"]) < 2:
+            missing.append("name")
+        if not re.match(r"^[+\d][\d\s().-]{6,19}$", data["phone"]):
+            missing.append("phone")
+        if data["email"] and not re.match(r"^[^\s@]+@[^\s@]+\.[^\s@]+$", data["email"]):
+            missing.append("email")
+        if missing:
+            self._json_response(400, {"ok": False,
+                                      "error": "Missing or invalid fields.",
+                                      "fields": missing})
+            return
+
+        user_agent = self.headers.get("User-Agent", "") or ""
+        ref = None
+        stored_in = None
+        if SHEETS_WEBAPP_URL:
+            # Primary storage: append the lead to the same Google Sheet
+            try:
+                ref = save_whatsapp_lead_sheets(data, user_agent)
+                if ref:
+                    stored_in = "google-sheets"
+                    sys.stderr.write("[sheets] WhatsApp lead #%s appended to Google Sheet\n" % ref)
+            except Exception as exc:  # noqa: BLE001 — fall back so no lead is lost
+                sys.stderr.write("[sheets] WhatsApp lead save failed: %s\n" % exc)
+        if not ref:
+            # Fallback: local CSV (also used when SHEETS_WEBAPP_URL is not set)
+            try:
+                ref = save_whatsapp_lead(data)
+                stored_in = "csv"
+                sys.stderr.write("[csv] WhatsApp lead #%s appended to %s\n"
+                                 % (ref, os.path.join(DATA_DIR, WA_CSV_FILE)))
+            except OSError as exc:
+                sys.stderr.write("[csv] Failed to save WhatsApp lead: %s\n" % exc)
+                self._json_response(503, {"ok": False, "error": "storage_unavailable"})
+                return
+
+        self._json_response(200, {"ok": True, "ref": ref, "storage": stored_in})
 
 
 if __name__ == "__main__":

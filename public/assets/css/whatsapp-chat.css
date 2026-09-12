@@ -75,11 +75,14 @@
   font-size:15px;font-weight:800;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
   box-shadow:0 8px 22px rgba(37,211,102,.4);transition:transform .2s,box-shadow .2s;margin:4px 0}
 .wa-cta:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(37,211,102,.5)}
+.wa-cta:disabled{cursor:default;transform:none;box-shadow:0 6px 16px rgba(37,211,102,.25);opacity:.85}
+.wa-cta .wa-spin{width:16px;height:16px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:waSpin .8s linear infinite}
+@keyframes waSpin{to{transform:rotate(360deg)}}
 
 @media (max-width:520px){
   .wa-fab{left:16px;bottom:16px}
   .wa-panel{left:8px;bottom:88px;width:calc(100vw - 16px);height:calc(100dvh - 100px);max-height:none}
 }
 @media (prefers-reduced-motion:reduce){
-  .wa-fab::before,.wa-head-info .wa-dot,.wa-typing i,.wa-msg{animation:none}
+  .wa-fab::before,.wa-head-info .wa-dot,.wa-typing i,.wa-msg,.wa-cta .wa-spin{animation:none}
 }

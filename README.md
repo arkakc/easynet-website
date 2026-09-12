@@ -17,6 +17,11 @@ public/               ← THE WEBSITE (this folder is what gets deployed)
   site.webmanifest    PWA manifest (installable, themed)
 
 vercel.json           Vercel config (security headers, caching, output dir = public)
+api/                  Vercel serverless functions (used in production)
+  contact.js          POST /api/contact       — enquiry form (Sheet + email)
+  whatsapp-lead.js    POST /api/whatsapp-lead — WhatsApp chat widget (Sheet)
+  export.js           GET  /api/export        — jump to the leads Sheet
+google-apps-script/   Code.gs — the Sheet app that stores every lead row
 server.py             Optional secure local/dev server (python3 server.py)
 .htaccess             Apache / LiteSpeed config (if you host on cPanel instead)
 nginx.conf.example    nginx reference config
@@ -63,11 +68,22 @@ Google API keys needed. One-time setup:
      protect it with a long random `LEADS_EXPORT_TOKEN`)
 4. **Redeploy** the project so the env vars take effect.
 
-Each new row lands in the Sheet's **"Leads"** tab with columns
-`sequence_no, timestamp, source, name, company, email, phone, service,
-message, page, user_agent, raw`. If the Sheet is temporarily unreachable the
-enquiry is still emailed (with a `T########` fallback reference); if email
-fails it is still saved to the Sheet.
+Each new row lands in the Sheet's **"Leads"** tab — the same sheet is shared
+with the WhatsApp chat widget (see below). Columns, in order:
+
+| Column | Notes |
+|---|---|
+| `Ref No.` | 1, 2, 3… assigned by the Sheet — the same number the client sees |
+| `Date & Time` | when the lead was captured |
+| `Source` | `Website form` / `WhatsApp chat` / `WhatsApp` |
+| `Name` · `Phone` · `Email` · `Company` · `Service` · `Message` | the enquiry fields (optional ones may be blank) |
+| `Page URL` · `User Agent` · `Details` | where it came from, browser, raw payload |
+
+If the Sheet is temporarily unreachable the enquiry is still emailed (with a
+`T########` fallback reference); if email fails it is still saved to the Sheet.
+An older Sheet (created before the friendly headings) is upgraded in place on
+the next write — old rows are re-ordered to the new column order, nothing is
+deleted.
 
 ## Local / VPS (`server.py`)
 
@@ -82,6 +98,55 @@ fails it is still saved to the Sheet.
    `SMTP_PASS`. With neither configured, each email is saved to
    `data/outbox/enquiry-XXXXX.eml` so nothing is ever lost.
 4. `CONTACT_TO` overrides the destination (default hello.easynet@hotmail.com).
+
+---
+
+# WhatsApp chat widget (`wa-fab`)
+
+The green WhatsApp bubble on every page opens a guided chat
+(`public/assets/js/whatsapp-chat.js`) that collects the lead step by step —
+exactly as the client sees it:
+
+1. **Full name** *(required)*
+2. **Phone / WhatsApp number** *(required)* — everything from here on is stored
+   in the same row of the Google Sheet
+3. **Email address** *(optional — for our written quotation)*
+4. **Company or business** *(optional)*
+5. **Which service are you interested in?** (chips, same list as `main.js`)
+
+Then the enquiry card appears with the **SEND button**. The moment the client
+taps it:
+
+1. the lead is **saved to the Google Sheet** through
+   **`POST /api/whatsapp-lead`** (`api/whatsapp-lead.js` on Vercel,
+   `server.py` locally) → source **`WhatsApp chat`**, with a **Ref No.**
+   Name + phone are the only required fields; anything the client skipped is
+   stored as a blank cell in the same row.
+2. **WhatsApp opens** with a short message that carries that Ref No.:
+
+   ```
+   Hi Easynet 👋 I just sent my enquiry through your website.
+
+   Ref No. 12
+   👤 Name: John Mako
+   📞 Phone: +675 7012 3456
+   🛠 Service: IT Infrastructure
+   ```
+3. the chat **ends with the thank-you message**:
+   *"🎉 Thank you, John! Our team will contact you shortly."*
+
+If the Sheet (or the endpoint) is unavailable, the widget does **not** lose the
+lead: WhatsApp still opens, with the full structured enquiry inside the message
+instead of the short version. Closing and reopening the widget starts a fresh
+enquiry.
+
+There is **no "anything you'd like us to know about your project?" step** — the
+message field is reserved for the contact form and the WhatsApp Cloud API
+server, and stays blank for chat leads.
+
+**Requirements:** the same `SHEETS_WEBAPP_URL` + `SHEETS_SECRET` env vars used
+by the contact form (see `google-apps-script/Code.gs`). Nothing else to set up —
+the widget shows an error-free fallback if they are missing.
 
 ---
 
@@ -175,8 +240,9 @@ Google and AI engines.
 
 ## Notes
 - **No build, no Node required** — Vercel simply publishes `public/`.
-- The WhatsApp chat widget works out of the box on Vercel (it opens
-  `wa.me` links; the optional Cloud API server in `whatsapp-api/` runs
-  separately on a VPS or as a Vercel Function later).
+- The WhatsApp chat widget works out of the box on Vercel: it saves each lead
+  to the Google Sheet via `/api/whatsapp-lead` and opens `wa.me` with a short
+  message + Ref No. (the optional Cloud API server in `whatsapp-api/` runs
+  separately on a VPS, or as a Vercel Function later).
 - To deploy a preview of any branch/pull request: Vercel does this
   automatically (Preview URLs) — great for reviewing changes.

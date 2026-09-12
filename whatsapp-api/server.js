@@ -114,20 +114,32 @@ function saveLead(lead) {
 }
 
 /* ---------- parse structured lead text from the website widget ---------- */
-/* format:
+/* Current widget format — short, because the whole record is already
+   saved in the Google Sheet when the client taps SEND:
+
+   Hi Easynet 👋 I just sent my enquiry through your website.
+
+   Ref No. 12
+   👤 Name: John Mako
+   📞 Phone: +675 7012 3456
+   🛠 Service: IT Infrastructure
+
+   Fallback format — only sent when the Sheet save was unavailable:
+
    📋 *New Enquiry — Easynet IT Solutions*
    👤 Name: ...
    📞 Phone: ...
    ✉️ Email: ...
    🏢 Company: ...
-   🛠 Service: ...
-   💬 Message: ...                                   */
+   🛠 Service: ...                                   */
 function parseLeadText(text) {
   const pick = (label) => {
-    const m = text.match(new RegExp(label + ":(.*)"));
+    const m = text.match(new RegExp(label + "\\s*:(.*)"));
     return m ? m[1].trim() : "";
   };
+  const ref = text.match(/Ref\s*(?:No\.?|#)?\s*([0-9]{1,9})/i);
   return {
+    ref: ref ? ref[1] : "",
     name: pick("👤 Name"),
     phone: pick("📞 Phone"),
     email: pick("✉️ Email"),
@@ -226,7 +238,7 @@ const server = http.createServer(async (req, res) => {
 
     if (msg && msg.type === "text" && from) {
       const text = (msg.text && msg.text.body) || "";
-      const lead = text.includes("New Enquiry — Easynet")
+      const lead = /New Enquiry — Easynet|Ref\s*(?:No\.?|#)?\s*[0-9]/i.test(text)
         ? parseLeadText(text)
         : { name: "", phone: from.split("@")[0], email: "", company: "", service: "General enquiry", message: text, raw: text };
       const saved = saveLead(lead);
