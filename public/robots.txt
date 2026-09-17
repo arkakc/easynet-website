@@ -1,24 +1,23 @@
-# Easynet IT Solutions — robots.txt
-# Search engines and AI assistants are welcome to crawl this site.
+# Easynet IT Solutions Limited — robots.txt
+# Public crawl policy for search engines and AI answer engines.
 
 User-agent: *
 Allow: /
 
-# --- Search engines ---
+# Keep the sitemap canonical and aligned with the public www domain.
+Sitemap: https://www.easynetpng.com/sitemap.xml
+
+# Search crawlers
 User-agent: Googlebot
 Allow: /
 User-agent: Bingbot
 Allow: /
-User-agent: Slurp
-Allow: /
 User-agent: DuckDuckBot
 Allow: /
-User-agent: Baiduspider
-Allow: /
-User-agent: YandexBot
+User-agent: Applebot
 Allow: /
 
-# --- AI assistants / generative engines (GEO) ---
+# Generative / AI crawlers for GEO visibility
 User-agent: GPTBot
 Allow: /
 User-agent: OAI-SearchBot
@@ -29,8 +28,6 @@ User-agent: ClaudeBot
 Allow: /
 User-agent: Claude-Web
 Allow: /
-User-agent: anthropic-ai
-Allow: /
 User-agent: PerplexityBot
 Allow: /
 User-agent: Perplexity-User
@@ -39,19 +36,7 @@ User-agent: Google-Extended
 Allow: /
 User-agent: Applebot-Extended
 Allow: /
-User-agent: Applebot
-Allow: /
-User-agent: Amazonbot
-Allow: /
 User-agent: CCBot
-Allow: /
-User-agent: cohere-ai
-Allow: /
-User-agent: meta-externalagent
-Allow: /
-User-agent: DuckAssistBot
 Allow: /
 User-agent: YouBot
 Allow: /
-
-Sitemap: https://easynetpng.com/sitemap.xml
