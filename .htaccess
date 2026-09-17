@@ -19,6 +19,9 @@ ErrorDocument 404 /404.html
   RewriteCond %{THE_REQUEST} \s/+home\.html[\s?] [NC]
   RewriteRule ^home\.html$ / [R=301,L]
 
+  # One-page site policy: old or accidental service URLs should land on the homepage services section.
+  RewriteRule ^services(/.*)?$ /#services [R=301,L,NE]
+
   # Block dotfiles & dot-directories, EXCEPT /.well-known/security.txt (RFC 9116)
   RewriteRule (^|/)\.(?!well-known/security\.txt$) - [R=404,L]
 </IfModule>
