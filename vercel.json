@@ -4,6 +4,18 @@
   "framework": null,
   "outputDirectory": "public",
   "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/index.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/home.html",
+      "destination": "/",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -15,7 +27,8 @@
         { "key": "Permissions-Policy", "value": "geolocation=(), microphone=(), camera=(), payment=()" },
         { "key": "Strict-Transport-Security", "value": "max-age=31536000; includeSubDomains; preload" },
         { "key": "Cross-Origin-Opener-Policy", "value": "same-origin" },
-        { "key": "Cross-Origin-Resource-Policy", "value": "same-origin" }
+        { "key": "Cross-Origin-Resource-Policy", "value": "same-origin" },
+        { "key": "X-Robots-Tag", "value": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" }
       ]
     },
     {
