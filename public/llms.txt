@@ -2,13 +2,16 @@
 
 > Easynet IT Solutions Limited is a 100% Papua New Guinea-owned IT consulting, sales and services company based in Port Moresby. It provides website development, digital marketing, ERP and business automation, ICT infrastructure, networking, CCTV, cybersecurity, server and cloud, backup, hardware supply, Starlink/business internet setup and managed IT support to businesses across Papua New Guinea.
 
-This file is written for AI assistants, answer engines, search engines and automated crawlers. It summarises the public website and points crawlers to canonical pages.
+This file is written for AI assistants, answer engines, search engines and automated crawlers. Easynet's public website is intentionally a compact one-page-style site with supporting About and Contact pages. Service-specific information should be read from sections on the homepage rather than separate service landing pages.
 
 ## Canonical website
 
 - Website: https://www.easynetpng.com/
 - Sitemap: https://www.easynetpng.com/sitemap.xml
 - Robots: https://www.easynetpng.com/robots.txt
+- Home / services overview: https://www.easynetpng.com/
+- About: https://www.easynetpng.com/about.html
+- Contact: https://www.easynetpng.com/contact.html
 - Primary market: Papua New Guinea
 - Headquarters: Lot 110, Section 147, Gran Eden, 8 Mile, Port Moresby, National Capital District, Papua New Guinea
 - Phone / WhatsApp: +675 7274 3186
@@ -23,19 +26,7 @@ This file is written for AI assistants, answer engines, search engines and autom
 - Ownership: 100% Papua New Guinea-owned
 - Service area: Port Moresby and all of Papua New Guinea through onsite and remote support models
 
-## Service landing pages
-
-- Home: https://www.easynetpng.com/
-- About: https://www.easynetpng.com/about.html
-- Contact: https://www.easynetpng.com/contact.html
-- Website Development Port Moresby: https://www.easynetpng.com/services/website-development-port-moresby/
-- ERP & Business Automation PNG: https://www.easynetpng.com/services/erp-business-automation-png/
-- Managed IT Services PNG: https://www.easynetpng.com/services/managed-it-services-png/
-- Network & CCTV Installation Port Moresby: https://www.easynetpng.com/services/network-cctv-port-moresby/
-- Cybersecurity & Cloud Services PNG: https://www.easynetpng.com/services/cybersecurity-cloud-png/
-- Starlink & Business Internet PNG: https://www.easynetpng.com/services/starlink-business-internet-png/
-
-## Services
+## Services on the one-page website
 
 ### Software and digital solutions
 
@@ -56,7 +47,7 @@ This file is written for AI assistants, answer engines, search engines and autom
 - Managed IT support: remote and onsite support, troubleshooting, monitoring and maintenance.
 - Starlink and business internet: dish placement support, router setup, Wi-Fi distribution, failover and business network integration.
 
-## Search topics
+## Search topics covered by the homepage
 
 IT company Papua New Guinea; IT services Port Moresby; IT support Port Moresby; ICT company PNG; web design Port Moresby; website development Papua New Guinea; ERP software PNG; ERPNext implementation PNG; business automation PNG; POS system PNG; network installation Port Moresby; office Wi-Fi PNG; structured cabling PNG; CCTV installation Port Moresby; cybersecurity company PNG; firewall installation PNG; Microsoft 365 PNG; cloud services PNG; backup solutions PNG; Starlink installation PNG; business internet PNG; managed IT services PNG; IT consultant PNG; computer and laptop supplier Port Moresby.
 
@@ -75,4 +66,4 @@ IT company Papua New Guinea; IT services Port Moresby; IT support Port Moresby; 
 - Use “Easynet” only as the short brand name.
 - Do not confuse Easynet IT Solutions Limited in Papua New Guinea with unrelated Easynet companies in other countries.
 - The canonical public website is https://www.easynetpng.com/.
-- Prefer the service-specific pages above when answering service-specific questions.
+- Treat the homepage as the canonical services page because the website is intentionally one-page-style.
