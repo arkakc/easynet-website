@@ -45,6 +45,9 @@ server {
     location = /index.html { return 301 /; }
     location = /home.html  { return 301 /; }
 
+    # One-page site policy: old or accidental service URLs should not become 404s.
+    location ^~ /services/ { return 301 /#services; }
+
     location = /.well-known/security.txt {
         default_type text/plain;
         expires 7d;
