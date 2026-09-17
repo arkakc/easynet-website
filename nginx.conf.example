@@ -1,25 +1,27 @@
 # ============================================================
 # Easynet IT Solutions — nginx server block (reference)
 # Copy into /etc/nginx/conf.d/easynet.conf and adjust paths
-#
-# NOTE on add_header: nginx does NOT inherit `add_header` from the
-# server level into a location block that declares its own. To keep
-# the security headers on EVERY response, caching is done with the
-# `expires` directive (which never clobbers add_header) and no
-# location block declares add_header of its own.
 # ============================================================
 
 server {
     listen 80;
     server_name easynetpng.com www.easynetpng.com;
-
-    # redirect all traffic to HTTPS
-    return 301 https://$host$request_uri;
+    return 301 https://www.easynetpng.com$request_uri;
 }
 
 server {
     listen 443 ssl http2;
-    server_name easynetpng.com www.easynetpng.com;
+    server_name easynetpng.com;
+
+    ssl_certificate     /etc/letsencrypt/live/easynetpng.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/easynetpng.com/privkey.pem;
+
+    return 301 https://www.easynetpng.com$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name www.easynetpng.com;
 
     ssl_certificate     /etc/letsencrypt/live/easynetpng.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/easynetpng.com/privkey.pem;
@@ -28,9 +30,8 @@ server {
 
     root  /var/www/easynet;
     index index.html;
-    autoindex off;                       # no directory listing
+    autoindex off;
 
-    # ---- Security headers (inherited by every location below) ----
     add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" always;
     add_header X-Content-Type-Options nosniff always;
     add_header X-Frame-Options DENY always;
@@ -39,37 +40,35 @@ server {
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
     add_header Cross-Origin-Opener-Policy same-origin always;
     add_header Cross-Origin-Resource-Policy same-origin always;
-    add_header X-Powered-By "" always;   # hide server software
+    add_header X-Robots-Tag "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" always;
 
-    # ---- RFC 9116 security.txt must stay reachable (exact match wins
-    #      over the dotfile regex below) ----
+    location = /index.html { return 301 /; }
+    location = /home.html  { return 301 /; }
+
     location = /.well-known/security.txt {
         default_type text/plain;
         expires 7d;
         try_files $uri =404;
     }
 
-    # ---- Block sensitive files ----
-    location ~* \.(md|sql|bak|log|env|py|sh|conf|ini|json|key|pem|p12|crt|cert|tar|gz|zip)$ {
+    # Do not block .json globally: valid structured data/app files may need it.
+    location ~* \.(md|sql|bak|log|env|py|sh|conf|ini|key|pem|p12|crt|cert|tar|gz|zip)$ {
         return 404;
     }
-    location ~ /\. {                     # block dotfiles / dot-directories
+    location ~ /\. {
         return 404;
     }
 
-    # ---- Caching (expires only — never add_header here, or the
-    #      security headers above would be dropped for these files) ----
-    location ~* \.(css|js|png|jpg|jpeg|webp|svg|ico|woff2|webmanifest|xml)$ {
+    location ~* \.(css|js|png|jpg|jpeg|webp|svg|ico|woff2|webmanifest|xml|txt|json)$ {
         expires 7d;
         try_files $uri =404;
     }
 
     location / {
-        expires -1;                      # -> Cache-Control: no-cache for HTML
+        expires -1;
         try_files $uri $uri/ =404;
     }
 
-    # ---- Custom error page ----
     error_page 404 /404.html;
     location = /404.html {
         internal;
