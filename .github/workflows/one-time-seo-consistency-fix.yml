@@ -1,0 +1,63 @@
+name: One-time SEO consistency fix
+
+on:
+  push:
+    paths:
+      - '.github/workflows/one-time-seo-consistency-fix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply site-wide SEO consistency fixes
+        shell: python
+        run: |
+          from pathlib import Path
+
+          files = [Path('public/about.html'), Path('public/contact.html')]
+          for path in files:
+              text = path.read_text(encoding='utf-8')
+
+              # Canonical host consistency: use the public www hostname everywhere.
+              text = text.replace('https://easynetpng.com', 'https://www.easynetpng.com')
+
+              # Language consistency with the homepage and PNG targeting.
+              text = text.replace('<html lang="en">', '<html lang="en-PG">', 1)
+              text = text.replace('hreflang="en-pg"', 'hreflang="en-PG"')
+
+              # Avoid duplicate homepage URL links and use same-page homepage anchors.
+              text = text.replace('href="index.html#services"', 'href="/#services"')
+              text = text.replace('href="index.html#packages"', 'href="/#packages"')
+              text = text.replace('href="index.html#', 'href="/#')
+              text = text.replace('href="index.html"', 'href="/"')
+
+              path.write_text(text, encoding='utf-8')
+
+          # This workflow is intentionally one-time only.
+          Path('.github/workflows/one-time-seo-consistency-fix.yml').unlink()
+
+      - name: Verify fixes
+        run: |
+          set -e
+          ! grep -R "https://easynetpng.com" public/about.html public/contact.html
+          ! grep -R 'href="index.html' public/about.html public/contact.html
+          grep -q 'https://www.easynetpng.com/about.html' public/about.html
+          grep -q 'https://www.easynetpng.com/contact.html' public/contact.html
+          grep -q '<html lang="en-PG">' public/about.html
+          grep -q '<html lang="en-PG">' public/contact.html
+
+      - name: Commit fixes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/about.html public/contact.html .github/workflows/one-time-seo-consistency-fix.yml
+          git commit -m "Fix site-wide canonical and internal SEO consistency"
+          git push origin main
