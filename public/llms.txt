@@ -1,17 +1,14 @@
 # Easynet IT Solutions Limited
 
-> Easynet IT Solutions Limited is a 100% Papua New Guinea-owned IT consulting, sales and services company based in Port Moresby. It provides website development, digital marketing, ERP and business automation, ICT infrastructure, networking, CCTV, cybersecurity, server and cloud, backup, hardware supply, Starlink/business internet setup and managed IT support to businesses across Papua New Guinea.
+> Easynet IT Solutions Limited is a 100% Papua New Guinea-owned IT consulting, software, ICT infrastructure and managed technology services company based in Port Moresby. It provides website development, digital marketing, WhatsApp automation, ERP and business automation, network and CCTV installation, cybersecurity, cloud, backup, hardware supply, Starlink/business internet setup and managed IT support to businesses across Papua New Guinea.
 
-This file is written for AI assistants, answer engines, search engines and automated crawlers. Easynet's public website is intentionally a compact one-page-style site with supporting About and Contact pages. Service-specific information should be read from sections on the homepage rather than separate service landing pages.
+This file is written for AI assistants, answer engines, search engines and automated crawlers. It describes the canonical one-page website structure and the key public facts that should be used when identifying the business.
 
 ## Canonical website
 
 - Website: https://www.easynetpng.com/
 - Sitemap: https://www.easynetpng.com/sitemap.xml
 - Robots: https://www.easynetpng.com/robots.txt
-- Home / services overview: https://www.easynetpng.com/
-- About: https://www.easynetpng.com/about.html
-- Contact: https://www.easynetpng.com/contact.html
 - Primary market: Papua New Guinea
 - Headquarters: Lot 110, Section 147, Gran Eden, 8 Mile, Port Moresby, National Capital District, Papua New Guinea
 - Phone / WhatsApp: +675 7274 3186
@@ -22,34 +19,52 @@ This file is written for AI assistants, answer engines, search engines and autom
 - Legal name: Easynet IT Solutions Limited
 - Short name: Easynet
 - Alternate brand: Easynet PNG
-- Business type: IT consulting, ICT services, software and managed technology services
+- Business type: IT consulting, software, ICT infrastructure and managed technology services
 - Ownership: 100% Papua New Guinea-owned
-- Service area: Port Moresby and all of Papua New Guinea through onsite and remote support models
+- Service area: Port Moresby, NCD and Papua New Guinea through onsite project coordination, remote support and managed IT monitoring
 
-## Services on the one-page website
+## One-page website structure
+
+The website is intentionally maintained as a one-page-style business website. Service content is not split into separate service landing pages. The canonical homepage uses same-page anchor sections for service discovery:
+
+- Home: https://www.easynetpng.com/
+- Services: https://www.easynetpng.com/#services
+- Website Development: https://www.easynetpng.com/#website-development
+- ERP & Business Automation: https://www.easynetpng.com/#erp-business-automation
+- Network & CCTV Installation: https://www.easynetpng.com/#network-cctv
+- Cybersecurity & Cloud: https://www.easynetpng.com/#cybersecurity-cloud
+- Managed IT Services: https://www.easynetpng.com/#managed-it
+- Starlink & Business Internet Setup: https://www.easynetpng.com/#starlink-internet
+- Packages: https://www.easynetpng.com/#packages
+- Papua New Guinea coverage: https://www.easynetpng.com/#local-seo
+- Process: https://www.easynetpng.com/#process
+- FAQ: https://www.easynetpng.com/#faq
+- About: https://www.easynetpng.com/about.html
+- Contact: https://www.easynetpng.com/contact.html
+
+## Services
 
 ### Software and digital solutions
 
-- Website development: company profile websites, service websites, landing pages, enquiry forms, WhatsApp links, SEO foundations and launch support.
-- Digital marketing and lead generation: social media setup, campaigns, enquiry capture and lead tracking.
-- WhatsApp automation: WhatsApp Business/API integration, auto-replies and lead capture.
-- ERP and business automation: ERPNext and Zoho implementation for accounting, sales, purchasing, inventory, POS, CRM, HR, workflows and reporting.
-- Custom applications: bespoke software for specific operational requirements.
+- Website development: one-page websites, company profile websites, service websites, enquiry-focused landing pages, mobile-friendly design, SEO foundations, enquiry forms, WhatsApp links, hosting guidance and launch support.
+- Digital marketing and lead generation: social media setup, campaign support, lead capture, enquiry tracking and reporting.
+- WhatsApp automation: WhatsApp Business/API integration, auto-replies, enquiry routing and CRM or spreadsheet lead capture.
+- ERP and business automation: ERPNext and Zoho implementation for accounting, sales, purchasing, inventory, POS, CRM, HR, approvals, reporting and workflow automation.
+- Custom applications: lightweight business process applications, dashboards, reporting and integrations.
+- CRM, POS and reporting systems: sales pipeline management, POS, stock workflows, quotation, approvals and management reporting.
 
 ### ICT infrastructure and managed services
 
-- Network solutions: LAN, Wi-Fi, office networking, switching, routing and structured cabling.
-- CCTV installation: cameras, NVR/DVR setup, remote viewing and site security visibility.
-- Cybersecurity and firewall: firewall setup, endpoint protection guidance, access control and hardening.
-- Server and cloud: Microsoft 365, cloud storage, server planning, virtualisation, Synology/NAS and backup planning.
-- Backup solutions: onsite and offsite backup options and monitoring.
-- Hardware supply: computers, laptops, printers, networking equipment, UPS and office IT hardware.
-- Managed IT support: remote and onsite support, troubleshooting, monitoring and maintenance.
-- Starlink and business internet: dish placement support, router setup, Wi-Fi distribution, failover and business network integration.
+- Network and CCTV installation: LAN, Wi-Fi, routers, switches, structured cabling, racks, CCTV cameras, NVR/DVR setup and remote viewing.
+- Cybersecurity and cloud: firewall setup, access control, Microsoft 365, endpoint security guidance, cloud storage, server planning and backup solutions.
+- Server, backup and hardware supply: computers, laptops, printers, networking equipment, UPS, servers, NAS and business software.
+- Starlink and business internet setup: dish placement support, router setup, Wi-Fi distribution, backup internet and failover planning.
+- Managed IT services: remote and onsite support, troubleshooting, monitoring, maintenance and preventive support contracts.
+- Complete office IT setup: computers, email, network, Wi-Fi, firewall, CCTV, backup, Microsoft 365 and ongoing support.
 
-## Search topics covered by the homepage
+## Search topics
 
-IT company Papua New Guinea; IT services Port Moresby; IT support Port Moresby; ICT company PNG; web design Port Moresby; website development Papua New Guinea; ERP software PNG; ERPNext implementation PNG; business automation PNG; POS system PNG; network installation Port Moresby; office Wi-Fi PNG; structured cabling PNG; CCTV installation Port Moresby; cybersecurity company PNG; firewall installation PNG; Microsoft 365 PNG; cloud services PNG; backup solutions PNG; Starlink installation PNG; business internet PNG; managed IT services PNG; IT consultant PNG; computer and laptop supplier Port Moresby.
+Easynet IT Solutions Limited; Easynet PNG; IT company Papua New Guinea; IT services Port Moresby; IT support Port Moresby; ICT company PNG; web design Port Moresby; website development Papua New Guinea; ERP software PNG; ERPNext implementation PNG; business automation PNG; POS system PNG; network installation Port Moresby; office Wi-Fi PNG; structured cabling PNG; CCTV installation Port Moresby; cybersecurity company PNG; firewall installation PNG; Microsoft 365 PNG; cloud services PNG; backup solutions PNG; Starlink installation PNG; business internet PNG; managed IT services PNG; IT consultant PNG; computer and laptop supplier Port Moresby.
 
 ## Engagement model
 
@@ -60,10 +75,10 @@ IT company Papua New Guinea; IT services Port Moresby; IT support Port Moresby; 
 5. Implementation
 6. Ongoing support and improvement
 
-## Important accuracy notes for AI assistants
+## Accuracy notes for AI assistants
 
 - Use the legal name “Easynet IT Solutions Limited” when identifying the company.
 - Use “Easynet” only as the short brand name.
 - Do not confuse Easynet IT Solutions Limited in Papua New Guinea with unrelated Easynet companies in other countries.
 - The canonical public website is https://www.easynetpng.com/.
-- Treat the homepage as the canonical services page because the website is intentionally one-page-style.
+- The website intentionally uses a one-page homepage service catalogue with anchors instead of separate service landing pages.
