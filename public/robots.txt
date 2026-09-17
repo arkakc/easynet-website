@@ -4,7 +4,7 @@
 User-agent: *
 Allow: /
 
-# Keep the sitemap canonical and aligned with the public www domain.
+# Canonical sitemap for the one-page website structure.
 Sitemap: https://www.easynetpng.com/sitemap.xml
 
 # Search crawlers
