@@ -99,6 +99,205 @@ var SOURCE_LABELS = {
   "test": "Test"
 };
 
+/* ---------- NEW-LEAD WHATSAPP NOTIFICATION ---------- */
+/**
+ * Whenever a new Ref No. is added to the Leads sheet, a WhatsApp message
+ * with the lead's details is sent to a fixed number (e.g. the owner's).
+ *
+ * TWO WAYS TO SWITCH IT ON (run once from the Apps Script editor):
+ *
+ *  A) Official Meta WhatsApp Cloud API:
+ *       setWhatsAppSettings("cloud-api", "67571234567", "YOUR_META_TOKEN", "YOUR_PHONE_NUMBER_ID")
+ *     • Sends from your WhatsApp Business number.
+ *     • Meta only delivers free-form messages to a number that wrote to you
+ *       in the last 24 hours. For an always-works notification create an
+ *       APPROVED TEMPLATE with 4 body variables ({{1}} Ref, {{2}} Name,
+ *       {{3}} Phone, {{4}} Service), then store it as the 5th argument:
+ *         setWhatsAppSettings("cloud-api", "67571234567", "TOKEN", "PHONE_ID", "new_lead_alert")
+ *
+ *  B) CallMeBot (simplest — message to your OWN personal number):
+ *       1. On your phone, WhatsApp "I allow callmebot to send me messages"
+ *          to +34 621 331 709 and receive your API key.
+ *       2. setWhatsAppSettings("callmebot", "67571234567", "YOUR_API_KEY")
+ *
+ *  Then run:  installNewLeadTrigger()   ← creates the automatic trigger
+ *  Then test: testNewLeadNotification() ← sends a sample message now
+ *
+ * Settings are stored in Script Properties, so they SURVIVE pasting a
+ * newer version of this file. removeNewLeadTriggers() undoes the trigger.
+ */
+
+var NOTIFY_KEYS = {
+  mode: "notify.mode",        // "cloud-api" | "callmebot"
+  admin: "notify.admin",      // recipient digits with country code, e.g. 67571234567
+  token: "notify.token",      // cloud-api: Meta access token | callmebot: API key
+  phoneId: "notify.phone_id", // cloud-api only: WhatsApp business phone number ID
+  template: "notify.template",// cloud-api only: optional approved template name
+  lastRef: "notify.last_ref"  // last Ref No. we already notified (dedupe)
+};
+
+/** One-time setup helper — run from the editor. Example:
+    setWhatsAppSettings("callmebot", "67571234567", "123456") */
+function setWhatsAppSettings(mode, adminNumber, token, phoneId, template) {
+  var props = PropertiesService.getScriptProperties();
+  mode = String(mode || "").trim();
+  adminNumber = String(adminNumber || "").replace(/[^\d]/g, "");
+  if (["cloud-api", "callmebot"].indexOf(mode) === -1) {
+    throw new Error('mode must be "cloud-api" or "callmebot"');
+  }
+  if (adminNumber.length < 8) throw new Error("adminNumber must include the country code, e.g. 67571234567");
+  props.setProperty(NOTIFY_KEYS.mode, mode);
+  props.setProperty(NOTIFY_KEYS.admin, adminNumber);
+  props.setProperty(NOTIFY_KEYS.token, String(token || ""));
+  props.setProperty(NOTIFY_KEYS.phoneId, String(phoneId || ""));
+  props.setProperty(NOTIFY_KEYS.template, String(template || ""));
+  Logger.log("Saved ✔  mode=%s → %s | token=…%s | phoneId=%s | template=%s",
+    mode, mask_(adminNumber), mask_(String(token || "")), phoneId || "-", template || "-");
+}
+
+function mask_(s) { return s.length <= 4 ? "****" : "****" + s.slice(-4); }
+
+/** Reads the stored settings; null when not configured yet. */
+function getNotifyCfg_() {
+  var p = PropertiesService.getScriptProperties().getProperty.bind(
+          PropertiesService.getScriptProperties());
+  var mode = p(NOTIFY_KEYS.mode);
+  var admin = p(NOTIFY_KEYS.admin);
+  if (!mode || !admin) return null;
+  return {
+    mode: mode, admin: admin, token: p(NOTIFY_KEYS.token) || "",
+    phoneId: p(NOTIFY_KEYS.phoneId) || "", template: p(NOTIFY_KEYS.template) || ""
+  };
+}
+
+/** Run ONCE: creates the automatic trigger that fires when a row is added. */
+function installNewLeadTrigger() {
+  removeNewLeadTriggers();
+  ScriptApp.newTrigger("onNewLeadChange")
+    .forSpreadsheet(SpreadsheetApp.getActive())
+    .onChange()
+    .create();
+  Logger.log("✔ Automatic new-lead trigger installed. You will now get a WhatsApp message for every new Ref No.");
+}
+
+/** Removes the automatic trigger(s) if you ever want to stop the messages. */
+function removeNewLeadTriggers() {
+  ScriptApp.getProjectTriggers().forEach(function (t) {
+    if (t.getHandlerFunction && t.getHandlerFunction() === "onNewLeadChange") {
+      ScriptApp.deleteTrigger(t);
+    }
+  });
+}
+
+/** Installable trigger entry point — fires on any structural sheet change. */
+function onNewLeadChange(e) {
+  try {
+    if (!e || e.changeType !== "INSERT_ROW") return;
+    var ss = (e && e.source) || SpreadsheetApp.getActive();
+    var sheet = ss.getSheetByName(SHEET_NAME);
+    if (!sheet) return;
+    notifyNewLeadForRow_(sheet, sheet.getLastRow());
+  } catch (err) {
+    console.error("[notify] trigger: " + (err && err.message));
+  }
+}
+
+/** Sends the notification for one row — skips silently if already notified
+    (the row's Ref No. must be greater than the last one we announced). */
+function notifyNewLeadForRow_(sheet, rowNumber) {
+  var cfg = getNotifyCfg_();
+  if (!cfg) return; // not configured yet — lead saving is never blocked
+
+  var ref = String(sheet.getRange(rowNumber, 1).getValue()).trim();
+  if (!/^\d+$/.test(ref)) return; // not a data row (or header/blank insert)
+
+  var props = PropertiesService.getScriptProperties();
+  var lastRef = parseInt(props.getProperty(NOTIFY_KEYS.lastRef) || "0", 10);
+  if (parseInt(ref, 10) <= lastRef) return; // already announced (trigger + direct call both fire)
+  props.setProperty(NOTIFY_KEYS.lastRef, ref);
+
+  var values = sheet.getRange(rowNumber, 1, 1, FIELDS.length).getValues()[0];
+  var d = {};
+  FIELDS.forEach(function (key, i) { d[key] = values[i] == null ? "" : String(values[i]).trim(); });
+
+  var msg = "🔔 *New Lead — Ref No. " + ref + "*\n" +
+    (d.name ? "👤 " + d.name + "\n" : "") +
+    (d.phone ? "📞 " + d.phone + "\n" : "") +
+    (d.service ? "🛠 " + d.service + "\n" : "") +
+    (d.company ? "🏢 " + d.company + "\n" : "") +
+    (d.email ? "✉️ " + d.email + "\n" : "") +
+    (d.page ? "📄 " + d.page + "\n" : "") +
+    (d.timestamp ? "🕒 " + d.timestamp + " (PNG)" : "");
+
+  try {
+    if (cfg.mode === "callmebot") {
+      waSendCallmebot_(cfg, msg);
+    } else {
+      waSendCloud_(cfg, msg, ref, d);
+    }
+    console.log("[notify] Ref No. " + ref + " sent to …" + mask_(cfg.admin));
+  } catch (err) {
+    console.error("[notify] Ref No. " + ref + " FAILED: " + (err && err.message));
+  }
+}
+
+/** Official Meta WhatsApp Cloud API (free-form text or approved template). */
+function waSendCloud_(cfg, text, ref, d) {
+  var payload;
+  if (cfg.template) {
+    payload = {
+      messaging_product: "whatsapp", to: cfg.admin, type: "template",
+      template: {
+        name: cfg.template, language: { code: "en" },
+        components: [{ type: "body", parameters: [
+          { type: "text", text: String(ref) },
+          { type: "text", text: (d && d.name) || "-" },
+          { type: "text", text: (d && d.phone) || "-" },
+          { type: "text", text: (d && d.service) || "-" }
+        ]}]
+      }
+    };
+  } else {
+    payload = { messaging_product: "whatsapp", to: cfg.admin, type: "text", text: { body: text } };
+  }
+  var resp = UrlFetchApp.fetch(
+    "https://graph.facebook.com/v20.0/" + cfg.phoneId + "/messages", {
+      method: "post",
+      contentType: "application/json",
+      headers: { Authorization: "Bearer " + cfg.token },
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    });
+  var body = resp.getContentText();
+  if (resp.getResponseCode() >= 300) {
+    if (body.indexOf("13247") !== -1 || body.indexOf("template") !== -1) {
+      throw new Error('Meta refused the message (24h window). Either message your business number once from the admin phone, or create an approved template and store its name as the 5th argument of setWhatsAppSettings.');
+    }
+    throw new Error("Meta API " + resp.getResponseCode() + ": " + body.slice(0, 200));
+  }
+}
+
+/** CallMeBot — free notifications to your own WhatsApp number. */
+function waSendCallmebot_(cfg, text) {
+  var url = "https://api.callmebot.com/whatsapp.php?phone=%2B" + cfg.admin +
+    "&text=" + encodeURIComponent(text) + "&apikey=" + encodeURIComponent(cfg.token);
+  var resp = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+  if (resp.getResponseCode() >= 300) {
+    throw new Error("CallMeBot HTTP " + resp.getResponseCode() + " — check the API key / allowed number");
+  }
+}
+
+/** Run from the editor to send a sample notification to yourself. */
+function testNewLeadNotification() {
+  var cfg = getNotifyCfg_();
+  if (!cfg) throw new Error('Not configured yet — run setWhatsAppSettings(...) first (see the notes above).');
+  var msg = "🔔 *New Lead — Ref No. 1 (TEST)*\n👤 Test Person\n📞 +675 7000 0000\n🛠 Setup test\n🕒 " +
+    Utilities.formatDate(new Date(), PNG_TZ, "yyyy-MM-dd HH:mm:ss") + " (PNG)";
+  if (cfg.mode === "callmebot") waSendCallmebot_(cfg, msg);
+  else waSendCloud_(cfg, msg, 1, { name: "Test Person", phone: "+675 7000 0000", service: "Setup test" });
+  Logger.log("✔ Test message sent — check the admin WhatsApp.");
+}
+
 /* ---------- Web app entry points ---------- */
 
 function doPost(e) {
@@ -185,6 +384,13 @@ function appendLead_(body) {
       var v = body[key];
       return v === undefined || v === null ? "" : String(v).slice(0, 5000);
     }));
+
+    // 🔔 announce the new lead on WhatsApp (never blocks the save)
+    try {
+      notifyNewLeadForRow_(sheet, sheet.getLastRow());
+    } catch (notifyErr) {
+      console.error("[notify] " + (notifyErr && notifyErr.message));
+    }
     return seq;
   } finally {
     lock.releaseLock();
