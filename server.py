@@ -47,7 +47,7 @@ CSV_HEADER = ["sequence_no", "timestamp", "name", "company", "email", "phone", "
 # the contact form; this CSV is only the local fallback storage.
 WA_CSV_FILE = "whatsapp-leads.csv"
 WA_CSV_HEADER = ["ref", "timestamp", "source", "name", "phone", "email",
-                 "company", "service", "message", "page"]
+                 "company", "service", "message", "page", "lead_id"]
 CSV_LOCK = threading.Lock()
 
 CONTACT_TO = os.environ.get("CONTACT_TO", "hello.easynet@hotmail.com")
@@ -160,6 +160,7 @@ def save_whatsapp_lead_sheets(data, user_agent=""):
         "secret": SHEETS_SECRET or None,
         "source": "whatsapp-chat",
         "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "lead_id": data.get("lead_id", ""),
         "name": data.get("name", ""),
         "phone": data.get("phone", ""),
         "email": data.get("email", ""),
@@ -184,6 +185,7 @@ def update_whatsapp_lead_sheets(ref, data, user_agent=""):
         "secret": SHEETS_SECRET or None,
         "action": "update",
         "ref": str(ref),
+        "lead_id": data.get("lead_id", ""),
         "source": "whatsapp-chat",
         "email": data.get("email", ""),
         "company": data.get("company", ""),
@@ -197,7 +199,8 @@ def update_whatsapp_lead_sheets(ref, data, user_agent=""):
 
 
 def update_whatsapp_lead_csv(ref, data):
-    """Same as above for the local CSV fallback (data/whatsapp-leads.csv)."""
+    """Same as above for the local CSV fallback (data/whatsapp-leads.csv).
+    The row is found by ref; if that fails, by the chat's lead_id."""
     with CSV_LOCK:
         path = os.path.join(DATA_DIR, WA_CSV_FILE)
         if not os.path.isfile(path):
@@ -206,9 +209,13 @@ def update_whatsapp_lead_csv(ref, data):
             rows = list(csv.reader(f))
         header = rows[0] if rows else WA_CSV_HEADER
         index = {name: i for i, name in enumerate(header)}
+        lead_id = (data.get("lead_id") or "").strip()
         found = False
         for row in rows[1:]:
-            if row and row[0].strip() == str(ref).strip():
+            matched = bool(row) and row[0].strip() == str(ref).strip() and str(ref).strip()
+            if not matched and lead_id and "lead_id" in index and len(row) > index["lead_id"]:
+                matched = row[index["lead_id"]].strip() == lead_id
+            if matched:
                 for key in ("email", "company", "service", "message"):
                     value = (data.get(key) or "").strip()
                     if not value or key not in index:
@@ -230,11 +237,38 @@ def save_whatsapp_lead(data):
 
     Fallback storage — used only when the Google Sheet is unreachable or
     SHEETS_WEBAPP_URL is not configured. Returns the reference number.
+
+    The widget saves one chat twice (name + phone first, the rest at the
+    end) with the same lead_id — if that row already exists here, the new
+    answers are written into it instead of appending a duplicate row.
     """
     with CSV_LOCK:
         os.makedirs(DATA_DIR, exist_ok=True)
         path = os.path.join(DATA_DIR, WA_CSV_FILE)
         new_file = not os.path.isfile(path)
+        lead_id = (data.get("lead_id") or "").strip()
+
+        if not new_file and lead_id:
+            with open(path, newline="", encoding="utf-8") as f:
+                rows = list(csv.reader(f))
+            header = rows[0] if rows else WA_CSV_HEADER
+            index = {name: i for i, name in enumerate(header)}
+            if "lead_id" in index:
+                for row in rows[1:]:
+                    if len(row) > index["lead_id"] and row[index["lead_id"]].strip() == lead_id:
+                        ref = row[0].strip()
+                        for key in ("name", "phone", "email", "company",
+                                    "service", "message", "page"):
+                            value = (data.get(key) or "").strip()
+                            if not value or key not in index:
+                                continue
+                            while len(row) <= index[key]:
+                                row.append("")
+                            row[index[key]] = value
+                        with open(path, "w", newline="", encoding="utf-8") as f:
+                            csv.writer(f).writerows(rows)
+                        return int(ref) if ref.isdigit() else ref
+
         ref = 1
         if not new_file:
             with open(path, newline="", encoding="utf-8") as f:
@@ -244,7 +278,8 @@ def save_whatsapp_lead(data):
                "WhatsApp chat",
                data.get("name", ""), data.get("phone", ""), data.get("email", ""),
                data.get("company", ""), data.get("service", ""),
-               data.get("message", ""), data.get("page", "")]
+               data.get("message", ""), data.get("page", ""),
+               data.get("lead_id", "")]
         with open(path, "a", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
             if new_file:
@@ -566,6 +601,7 @@ class SecureHandler(http.server.SimpleHTTPRequestHandler):
             "service": _sanitize(payload.get("service"), 80),
             "message": _sanitize(payload.get("message"), 2000),
             "page": _sanitize(payload.get("page"), 200),
+            "lead_id": _sanitize(payload.get("lead_id"), 64),
         }
         missing = []
         if len(data["name"]) < 2:
@@ -609,14 +645,16 @@ class SecureHandler(http.server.SimpleHTTPRequestHandler):
     def _update_whatsapp_lead(self, payload):
         """Write email / company / service into the row of an existing ref."""
         ref = _sanitize(payload.get("ref", payload.get("sequence_no", "")), 20)
-        if not ref:
-            self._json_response(400, {"ok": False, "error": "Missing ref."})
+        lead_id = _sanitize(payload.get("lead_id"), 64)
+        if not ref and not lead_id:
+            self._json_response(400, { "ok": False, "error": "Missing ref." })
             return
         data = {
             "email": _sanitize(payload.get("email"), 120),
             "company": _sanitize(payload.get("company"), 80),
             "service": _sanitize(payload.get("service"), 80),
             "message": _sanitize(payload.get("message"), 2000),
+            "lead_id": lead_id,
         }
         if data["email"] and not re.match(r"^[^\s@]+@[^\s@]+\.[^\s@]+$", data["email"]):
             self._json_response(400, {"ok": False,

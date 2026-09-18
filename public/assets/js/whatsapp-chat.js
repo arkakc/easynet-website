@@ -132,8 +132,26 @@
     return {
       step: -1, data: {}, started: false, sending: false, done: false,
       ref: null,          // Ref No. of the row created after the phone number
-      createPromise: null // the save fired as soon as the phone was sent
+      createPromise: null, // the save fired as soon as the phone was sent
+      leadId: null        // anonymous chat-session id — ties both saves to ONE row
     };
+  }
+
+  /* Both saves of one chat (name + phone, then the rest) carry the same
+     lead_id, so the Sheet can upsert them into a single row even if the
+     Ref No. of the first save never reaches the browser. */
+  function newLeadId() {
+    try {
+      if (window.crypto && typeof crypto.randomUUID === "function") {
+        return crypto.randomUUID();
+      }
+    } catch (e) { /* older browser — fall through */ }
+    return "wa-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10);
+  }
+
+  function ensureLeadId() {
+    if (!state.leadId) state.leadId = newLeadId();
+    return state.leadId;
   }
 
   function now() {
@@ -331,6 +349,7 @@
     if (state.createPromise || state.ref) return;
     var chat = state;                 // the chat this save belongs to
     var payload = baseBody();
+    payload.lead_id = ensureLeadId(); // same id as the final send → one row
     payload.name = state.data.name || "";
     payload.phone = state.data.phone || "";
     state.createPromise = postLead(payload).then(function (res) {
@@ -392,6 +411,7 @@
     var win = null;
     try { win = window.open("about:blank", "_blank"); } catch (e) { win = null; }
 
+    var leadId = ensureLeadId();      // ties this final save to the first one
     var rest = {
       email: state.data.email || "",
       company: state.data.company || "",
@@ -409,6 +429,7 @@
           var payload = baseBody();
           payload.action = "update";
           payload.ref = state.ref;
+          payload.lead_id = leadId;
           payload.email = rest.email;
           payload.company = rest.company;
           payload.service = rest.service;
@@ -416,10 +437,12 @@
             return { ref: state.ref, restSaved: !!(out && out.ok) };
           });
         }
-        // The early save never landed → create the row now, with everything.
+        // The early save's Ref No. never landed → upsert the full enquiry;
+        // the Sheet matches it to the first save via the shared lead_id.
         var payload = baseBody();
         payload.name = state.data.name || "";
         payload.phone = state.data.phone || "";
+        payload.lead_id = leadId;
         payload.email = rest.email;
         payload.company = rest.company;
         payload.service = rest.service;

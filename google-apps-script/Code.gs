@@ -53,21 +53,23 @@ var SHARED_SECRET = "easynet-live-Xk92mPq7Rw43Tz";
  */
 var HEADERS = [
   "Ref No.",      // 1  sequence number, assigned here (shared by all channels)
-  "Date & Time",  // 2  when the lead was captured
-  "Source",       // 3  "Website form" / "WhatsApp chat" / "WhatsApp"
-  "Name",         // 4  ┐
-  "Phone",        // 5  │ the 6 enquiry fields from the chat / contact form
-  "Email",        // 6  │ (optional fields are simply left blank)
-  "Company",      // 7  │
-  "Service",      // 8  │
-  "Message",      // 9  ┘
-  "Page URL",     // 10 page the lead came from
-  "User Agent",   // 11 browser (contact form only)
-  "Details"       // 12 raw payload / full WhatsApp text
+  "Lead ID",      // 2  anonymous chat-session id — both saves of one chat carry
+                  //     it, so the second save always finds the SAME row
+  "Date & Time",  // 3  when the lead was captured
+  "Source",       // 4  "Website form" / "WhatsApp chat" / "WhatsApp"
+  "Name",         // 5  ┐
+  "Phone",        // 6  │ the 6 enquiry fields from the chat / contact form
+  "Email",        // 7  │ (optional fields are simply left blank)
+  "Company",      // 8  │
+  "Service",      // 9  │
+  "Message",      // 10 ┘
+  "Page URL",     // 11 page the lead came from
+  "User Agent",   // 12 browser (contact form only)
+  "Details"       // 13 raw payload / full WhatsApp text
 ];
 var FIELDS = [
-  "sequence_no", "timestamp", "source", "name", "phone", "email", "company",
-  "service", "message", "page", "user_agent", "raw"
+  "sequence_no", "lead_id", "timestamp", "source", "name", "phone", "email",
+  "company", "service", "message", "page", "user_agent", "raw"
 ];
 
 /** Headings used by earlier versions — mapped so old sheets upgrade in place. */
@@ -134,9 +136,26 @@ function appendLead_(body) {
     var sheet = getOrCreateSheet_();
     ensureHeaders_(sheet);
 
+    var leadId = String(body.lead_id != null ? body.lead_id : "").trim();
+
+    /* The chat saves each lead in two moments (name + phone first, the rest
+       at the end). Both requests carry the same anonymous Lead ID, so if a
+       row with this ID already exists the new answers are written into THAT
+       row and its existing Ref No. is returned — a duplicate row is never
+       appended, even if the first save's Ref No. never reached the browser. */
+    if (leadId) {
+      var existing = findRowByField_(sheet, "lead_id", leadId);
+      if (existing !== -1) {
+        writeLeadFields_(sheet, existing, body);
+        var existingRef = parseInt(sheet.getRange(existing, 1).getValue(), 10);
+        return existingRef || existing;
+      }
+    }
+
     // Header occupies row 1 → the next empty row number == data-row count + 1
     var seq = sheet.getLastRow();
     body.sequence_no = seq; // write the computed number into the row itself
+    if (leadId) body.lead_id = leadId;
 
     if (!body.timestamp) {
       body.timestamp = Utilities.formatDate(
@@ -161,6 +180,9 @@ function appendLead_(body) {
  * service, message — into the row already created for this lead, each one
  * under its own column heading.
  *
+ * The row is found by Ref No.; if that fails (e.g. the Ref No. was lost on
+ * the way back to the browser), it is found by the chat's Lead ID instead.
+ *
  * Only the fields present in the request are written, so an empty/skipped
  * answer never erases what is already in the row.
  */
@@ -169,35 +191,55 @@ function updateLead_(body) {
   lock.waitLock(10000);
   try {
     var ref = String(body.ref != null ? body.ref : body.sequence_no || "").trim();
-    if (!ref) throw new Error("update needs the lead's ref");
+    var leadId = String(body.lead_id != null ? body.lead_id : "").trim();
+    if (!ref && !leadId) throw new Error("update needs the lead's ref or lead id");
 
     var sheet = getOrCreateSheet_();
     ensureHeaders_(sheet);
     var lastRow = sheet.getLastRow();
-    if (lastRow < 2) throw new Error("no leads in the sheet yet (ref " + ref + ")");
+    if (lastRow < 2) throw new Error("no leads in the sheet yet (ref " + (ref || leadId) + ")");
 
-    // Find the row whose "Ref No." column holds this reference.
-    var refs = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+    // Find the row: by Ref No. first, then by the chat's Lead ID.
     var row = -1;
-    for (var i = 0; i < refs.length; i++) {
-      if (String(refs[i][0]).trim() === ref) { row = i + 2; break; }
-    }
-    if (row === -1) throw new Error("unknown ref " + ref);
+    if (ref) row = findRowByField_(sheet, "sequence_no", ref);
+    if (row === -1 && leadId) row = findRowByField_(sheet, "lead_id", leadId);
+    if (row === -1) throw new Error("unknown lead (ref " + (ref || leadId) + ")");
 
-    // Columns the chat is allowed to fill in later — never the Ref No.,
-    // the original date/time or the channel.
-    var updatable = ["name", "phone", "email", "company", "service", "message",
-                     "page", "user_agent", "raw"];
-    FIELDS.forEach(function (key, idx) {
-      if (updatable.indexOf(key) === -1) return;
-      var v = body[key];
-      if (v === undefined || v === null || String(v).trim() === "") return; // keep what's there
-      sheet.getRange(row, idx + 1).setValue(String(v).slice(0, 5000));
-    });
-    return parseInt(ref, 10) || ref;
+    writeLeadFields_(sheet, row, body);
+    return parseInt(ref, 10) ||
+           parseInt(sheet.getRange(row, 1).getValue(), 10) || ref || leadId;
   } finally {
     lock.releaseLock();
   }
+}
+
+/** First data row whose given field column equals value → row number, else -1. */
+function findRowByField_(sheet, fieldKey, value) {
+  var col = FIELDS.indexOf(fieldKey) + 1;
+  if (col === 0) return -1;
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) return -1;
+  var values = sheet.getRange(2, col, lastRow - 1, 1).getValues();
+  var needle = String(value).trim();
+  for (var i = 0; i < values.length; i++) {
+    if (String(values[i][0]).trim() === needle) return i + 2;
+  }
+  return -1;
+}
+
+/** Writes the chat's answers (lead_id, name, phone, email, company, service,
+    message, page, user agent, raw) into one row, each under its own column.
+    Ref No., Date & Time and Source are never touched. Blank/skipped answers
+    in the request are skipped too, so nothing already saved is erased. */
+function writeLeadFields_(sheet, row, body) {
+  var updatable = ["lead_id", "name", "phone", "email", "company", "service",
+                   "message", "page", "user_agent", "raw"];
+  FIELDS.forEach(function (key, idx) {
+    if (updatable.indexOf(key) === -1) return;
+    var v = body[key];
+    if (v === undefined || v === null || String(v).trim() === "") return;
+    sheet.getRange(row, idx + 1).setValue(String(v).slice(0, 5000));
+  });
 }
 
 /**

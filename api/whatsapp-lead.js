@@ -106,6 +106,7 @@ module.exports = async (req, res) => {
   }
 
   const data = {
+    lead_id: sanitize(payload.lead_id, 64),
     name: sanitize(payload.name, 80),
     phone: sanitize(payload.phone, 25),
     email: sanitize(payload.email, 120),
@@ -121,7 +122,7 @@ module.exports = async (req, res) => {
     const ref = sanitize(
       payload.ref != null ? payload.ref : payload.sequence_no, 20
     );
-    if (!ref) {
+    if (!ref && !data.lead_id) {
       return res.status(400).json({ ok: false, error: "Missing ref." });
     }
     if (data.email && !EMAIL_RE.test(data.email)) {
@@ -140,6 +141,7 @@ module.exports = async (req, res) => {
         secret: SHEETS_SECRET || undefined,
         action: "update",
         ref: ref,
+        lead_id: data.lead_id,
         source: SOURCE,
         email: data.email,
         company: data.company,
@@ -147,7 +149,12 @@ module.exports = async (req, res) => {
         message: data.message,
       });
       // Echo the row we updated (the Sheet answers with it as well).
-      const outRef = /^\d+$/.test(ref) ? parseInt(ref, 10) : ref;
+      const outRef =
+        out && out.ref != null
+          ? out.ref
+          : /^\d+$/.test(ref)
+          ? parseInt(ref, 10)
+          : null;
       return res.status(200).json({ ok: true, ref: outRef, updated: true });
     } catch (err) {
       console.error("[whatsapp-lead:update]", err && err.message);
@@ -181,6 +188,7 @@ module.exports = async (req, res) => {
       secret: SHEETS_SECRET || undefined,
       source: SOURCE,
       timestamp: new Date().toISOString(),
+      lead_id: data.lead_id,
       name: data.name,
       phone: data.phone,
       email: data.email,
