@@ -96,7 +96,8 @@ function doPost(e) {
       return json_({ ok: false, error: "bad json" });
     }
     if (SHARED_SECRET && body.secret !== SHARED_SECRET) {
-      return json_({ ok: false, error: "unauthorized" });
+      return json_({ ok: false,
+        error: "unauthorized: secret mismatch - SHARED_SECRET in Code.gs must equal the SHEETS_SECRET env var on the backend" });
     }
     /* An existing lead is completed as the chat continues: the widget saves
        name + phone first (creating the row + Ref No.) and then writes the
@@ -113,11 +114,14 @@ function doPost(e) {
   }
 }
 
-/** Health check — open the /exec URL in a browser to verify the deployment. */
+/** Health check — open the /exec URL in a browser to verify the deployment.
+    VERSION lets you confirm THIS code (not an older deployment) is live. */
+var VERSION = "2026-09-18 lead-id-upsert";
 function doGet() {
   return json_({
     ok: true,
     service: "easynet-lead-capture",
+    version: VERSION,
     sheet: SHEET_NAME,
     columns: HEADERS
   });
