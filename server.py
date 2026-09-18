@@ -31,7 +31,7 @@ import threading
 import urllib.error
 import urllib.parse
 import urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from email.message import EmailMessage
 from email.utils import formatdate
 
@@ -49,6 +49,14 @@ WA_CSV_FILE = "whatsapp-leads.csv"
 WA_CSV_HEADER = ["ref", "timestamp", "source", "name", "phone", "email",
                  "company", "service", "message", "page", "lead_id"]
 CSV_LOCK = threading.Lock()
+
+# Papua New Guinea time (UTC+10, no daylight saving) — used for all
+# locally stored timestamps so they match the Google Sheet.
+PNG_TZ = timezone(timedelta(hours=10), name="PNG")
+
+
+def png_now_str():
+    return datetime.now(PNG_TZ).strftime("%Y-%m-%d %H:%M:%S PNG")
 
 CONTACT_TO = os.environ.get("CONTACT_TO", "hello.easynet@hotmail.com")
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
@@ -138,7 +146,7 @@ def save_enquiry(data):
             with open(ENQUIRIES_CSV, newline="", encoding="utf-8") as f:
                 seq = sum(1 for _ in csv.reader(f))  # header counts as row 1 → next seq
         row = [seq,
-               datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
+               png_now_str(),
                data.get("name", ""), data.get("company", ""), data.get("email", ""),
                data.get("phone", ""), data.get("service", ""), data.get("message", "")]
         with open(ENQUIRIES_CSV, "a", newline="", encoding="utf-8") as f:
@@ -274,7 +282,7 @@ def save_whatsapp_lead(data):
             with open(path, newline="", encoding="utf-8") as f:
                 ref = sum(1 for _ in csv.reader(f))  # header counts as row 1
         row = [ref,
-               datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
+               png_now_str(),
                "WhatsApp chat",
                data.get("name", ""), data.get("phone", ""), data.get("email", ""),
                data.get("company", ""), data.get("service", ""),

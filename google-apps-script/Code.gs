@@ -43,6 +43,18 @@
 
 var SHEET_NAME = "Leads";
 
+/** All "Date & Time" values are stored in PNG time (Pacific/Port_Moresby, UTC+10),
+    no matter which backend sent the lead or in what timezone. */
+var PNG_TZ = "Pacific/Port_Moresby";
+
+/** Converts an incoming timestamp (e.g. the ISO/UTC string from the website)
+    to PNG local time; with no value it uses the current time. */
+function pngTimestamp_(value) {
+  var d = value ? new Date(value) : new Date();
+  if (isNaN(d.getTime())) d = new Date(); // unparsable input → fall back to now
+  return Utilities.formatDate(d, PNG_TZ, "yyyy-MM-dd HH:mm:ss");
+}
+
 /** Must equal the SHEETS_SECRET env var on the website backend. */
 var SHARED_SECRET = "easynet-live-Xk92mPq7Rw43Tz";
 
@@ -55,7 +67,7 @@ var HEADERS = [
   "Ref No.",      // 1  sequence number, assigned here (shared by all channels)
   "Lead ID",      // 2  anonymous chat-session id — both saves of one chat carry
                   //     it, so the second save always finds the SAME row
-  "Date & Time",  // 3  when the lead was captured
+  "Date & Time",  // 3  when the lead was captured (PNG time, UTC+10)
   "Source",       // 4  "Website form" / "WhatsApp chat" / "WhatsApp"
   "Name",         // 5  ┐
   "Phone",        // 6  │ the 6 enquiry fields from the chat / contact form
@@ -162,9 +174,9 @@ function appendLead_(body) {
     if (leadId) body.lead_id = leadId;
 
     if (!body.timestamp) {
-      body.timestamp = Utilities.formatDate(
-        new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd HH:mm:ss"
-      );
+      body.timestamp = pngTimestamp_(); // current PNG time
+    } else {
+      body.timestamp = pngTimestamp_(body.timestamp); // convert to PNG time
     }
     if (body.source) {
       body.source = SOURCE_LABELS[String(body.source)] || String(body.source);
