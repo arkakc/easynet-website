@@ -4,7 +4,7 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://www.easynetpng.com/</loc>
-    <lastmod>2026-09-17</lastmod>
+    <lastmod>2026-10-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="en-pg" href="https://www.easynetpng.com/"/>
@@ -17,7 +17,7 @@
   </url>
   <url>
     <loc>https://www.easynetpng.com/about.html</loc>
-    <lastmod>2026-09-17</lastmod>
+    <lastmod>2026-10-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="en-pg" href="https://www.easynetpng.com/about.html"/>
@@ -25,10 +25,15 @@
   </url>
   <url>
     <loc>https://www.easynetpng.com/contact.html</loc>
-    <lastmod>2026-09-17</lastmod>
+    <lastmod>2026-10-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="en-pg" href="https://www.easynetpng.com/contact.html"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.easynetpng.com/contact.html"/>
   </url>
+  <url><loc>https://www.easynetpng.com/ict-sales-port-moresby.html</loc><lastmod>2026-10-15</lastmod></url>
+  <url><loc>https://www.easynetpng.com/website-development-port-moresby.html</loc><lastmod>2026-10-15</lastmod></url>
+  <url><loc>https://www.easynetpng.com/erp-implementation-png.html</loc><lastmod>2026-10-15</lastmod></url>
+  <url><loc>https://www.easynetpng.com/ict-services-port-moresby.html</loc><lastmod>2026-10-15</lastmod></url>
+  <url><loc>https://www.easynetpng.com/network-installation-png.html</loc><lastmod>2026-10-15</lastmod></url>
 </urlset>
