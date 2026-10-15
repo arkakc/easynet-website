@@ -32,9 +32,9 @@ function sanitize(v, limit) {
     .slice(0, limit);
 }
 
-/* Google Apps Script Web Apps answer the first POST with a 302
-   redirect to a one-time URL. fetch() would follow it as a GET and
-   lose the payload, so we follow manually and POST the body again. */
+/* Apps Script executes the original POST and redirects to a temporary
+   googleusercontent.com URL for the RESPONSE. Fetch that response with GET;
+   sending a second POST there causes HTTP 405. */
 const SHEETS_TIMEOUT_MS = 8000; 
 async function postToWebApp(url, body) {
   const headers = { "Content-Type": "text/plain;charset=utf-8" };
@@ -50,8 +50,11 @@ async function postToWebApp(url, body) {
   const loc =
     r.status >= 300 && r.status < 400 ? r.headers.get("location") : null;
   if (loc) {
-    r = await fetch(loc, { method: "POST", headers, body: payload,
-                          signal: AbortSignal.timeout(SHEETS_TIMEOUT_MS), });
+    r = await fetch(loc, {
+      method: "GET",
+      redirect: "follow",
+      signal: AbortSignal.timeout(SHEETS_TIMEOUT_MS),
+    });
   }
   if (!r.ok) throw new Error("Sheets web app HTTP " + r.status);
 
