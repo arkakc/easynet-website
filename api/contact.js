@@ -12,7 +12,7 @@
      SHEETS_WEBAPP_URL — Apps Script Web App URL (ends in /exec)
      SHEETS_SECRET     — must match SHARED_SECRET in Code.gs
      RESEND_API_KEY    — from resend.com
-     CONTACT_TO        — default: hello.easynet@hotmail.com
+     CONTACT_TO        — default: info@easynetpng.com
      CONTACT_FROM      — default: onboarding@resend.dev
    ============================================================ */
 "use strict";
@@ -20,7 +20,7 @@
 const SHEETS_WEBAPP_URL = (process.env.SHEETS_WEBAPP_URL || "").trim();
 const SHEETS_SECRET = process.env.SHEETS_SECRET || "";
 const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
-const CONTACT_TO = process.env.CONTACT_TO || "hello.easynet@hotmail.com";
+const CONTACT_TO = process.env.CONTACT_TO || "info@easynetpng.com";
 const CONTACT_FROM =
   process.env.CONTACT_FROM || "Easynet Website <onboarding@resend.dev>";
 
