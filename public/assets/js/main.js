@@ -5,9 +5,9 @@
 /* ---- Company contact config — update these values in ONE place ---- */
 const EASYNET = {
   name: "Easynet IT Solutions Limited",
-  email: "sales@easynetpng.com",
-  phone: "7238 0387",             // company phone (displayed via [data-easynet="phone"]) — visitor-facing
-  whatsapp: "67572743186",            // WhatsApp number (country code + number, digits only) — keep backend WhatsApp unchanged
+  email: "info@easynetpng.com",
+  phone: "+675 7238 0387",             // company phone (displayed via [data-easynet="phone"]) — visitor-facing
+  whatsapp: "67572380387",            // WhatsApp number (country code + number, digits only) — keep backend WhatsApp unchanged
   whatsappMsg: "Hello Easynet IT Solutions! I would like to discuss a technology solution for my business.",
   address: "Port Moresby, Papua New Guinea"
 };
