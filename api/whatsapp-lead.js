@@ -40,9 +40,7 @@ function sanitize(v, limit) {
 const PHONE_RE = /^[+\d][\d\s().-]{6,19}$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/* Google Apps Script Web Apps answer the first POST with a 302
-   redirect to a one-time URL. fetch() would follow it as a GET and
-   lose the payload, so we follow manually and POST the body again. */
+/* Follow the Google Apps Script POST response redirect using GET. */
 const SHEETS_TIMEOUT_MS = 8000;
 async function postToWebApp(url, body) {
   const headers = { "Content-Type": "text/plain;charset=utf-8" };
@@ -59,9 +57,8 @@ async function postToWebApp(url, body) {
     r.status >= 300 && r.status < 400 ? r.headers.get("location") : null;
   if (loc) {
     r = await fetch(loc, {
-      method: "POST",
-      headers,
-      body: payload,
+      method: "GET",
+      redirect: "follow",
       signal: AbortSignal.timeout(SHEETS_TIMEOUT_MS),
     });
   }
