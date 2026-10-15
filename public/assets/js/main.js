@@ -1,3 +1,23 @@
+
+// SEO conversion tracking. No personal details are transmitted.
+(function () {
+  function track(event) {
+    try {
+      var payload = JSON.stringify({event:event, path:location.pathname});
+      fetch("/api/seo-event", {method:"POST", headers:{"Content-Type":"application/json"}, body:payload, keepalive:true}).catch(function(){});
+      if (typeof window.gtag === "function") window.gtag("event", event, {page_path:location.pathname});
+    } catch(e) {}
+  }
+  window.easynetTrackConversion = track;
+  document.addEventListener("click", function(e) {
+    var link = e.target.closest && e.target.closest("a[href]");
+    if (!link) return;
+    var href = link.getAttribute("href") || "";
+    if (/^https:\/\/wa\.me\//.test(href)) track("whatsapp_click");
+    else if (/^tel:/i.test(href)) track("phone_click");
+    else if (/^\/contact\.html\?service=/.test(href)) track("quote_click");
+  });
+})();
 /* ============================================================
    Easynet IT Solutions — Site JavaScript
    ============================================================ */
@@ -228,6 +248,7 @@ if (form) {
         if (h) h.textContent = "Enquiry Sent! (Ref #" + seq + ")";
       }
       s.classList.add("show");
+      if (typeof window.easynetTrackConversion === "function") window.easynetTrackConversion("contact_success");
       s.scrollIntoView({ behavior: "smooth", block: "center" });
       // Fallback: also prepare a mailto link so nothing is lost without a backend
       const mail = document.getElementById("mailto-fallback");
