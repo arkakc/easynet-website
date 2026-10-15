@@ -58,7 +58,7 @@ PNG_TZ = timezone(timedelta(hours=10), name="PNG")
 def png_now_str():
     return datetime.now(PNG_TZ).strftime("%Y-%m-%d %H:%M:%S PNG")
 
-CONTACT_TO = os.environ.get("CONTACT_TO", "hello.easynet@hotmail.com")
+CONTACT_TO = os.environ.get("CONTACT_TO", "info@easynetpng.com")
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
 CONTACT_FROM = os.environ.get("CONTACT_FROM", "Easynet Website <onboarding@resend.dev>")
 # Google Sheets lead storage (see google-apps-script/Code.gs for setup).
